@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include "directory.h"
 
 /* Stats */
@@ -62,6 +63,7 @@ dir_entry_t *dir_get_shared(int core, uint64_t tag)
 	if((!val) ||
 	   (!DIR_IS_VALID(&val->line))) {
 		val = (dir_entry_t *)malloc(sizeof(dir_entry_t));
+		memset(val, 0, sizeof(dir_entry_t));
 		val->line.tag = tag;
 		val->line.state = ST_SHARED;
 		val->ref_count = 1;
@@ -152,6 +154,8 @@ dir_entry_t *dir_get_excl(int core, uint64_t tag)
 	   (!DIR_IS_VALID(&val->line))) {
 		/* Invalid cache line */
 		val = (dir_entry_t *)malloc(sizeof(dir_entry_t));
+		memset(val, 0, sizeof(dir_entry_t));
+
 		val->line.tag = tag;
 		val->owner = core;
 		val->ref_count = 1;

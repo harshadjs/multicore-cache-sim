@@ -8,6 +8,10 @@
 #include "simulator.h"
 #include "directory.h"
 
+#ifdef PINTOOL
+extern PIN_LOCK lock;
+#endif
+
 /* Stats */
 int hits, misses, directory_transactions, directory_misses,
 	directory_hits, directory_invalidations, directory_excl_hits,
@@ -19,7 +23,10 @@ uint32_t ticks;
 
 /* Cache array */
 cache_t cores[N_CORES];
+
+#ifdef PINTOOL
 #define printf(...)
+#endif
 
 void dump_core_cache(int core)
 {
@@ -231,7 +238,16 @@ void cache_write(int core, uint64_t address)
 }
 
 workload_t workload[] = {
-	{ MEM_WRITE, 0, 0x7fff5f8a97b8 },
+	/*
+	 * Following file "workload.h" contains a sample workload
+	 * for offline testing Pintool generates output in following format:
+	 *
+	 * { MEM_WRITE, 0, 0x7fff6eadac28 },
+	 *
+	 * This ouput can be directly copied and used here
+	 * Just redirect the output of pintool to file workload.h
+	 */
+#include "workload.h"
 };
 
 #define N_WORKLOAD ((sizeof(workload))/sizeof(workload[0]))
@@ -287,6 +303,7 @@ int main(int argc, char *argv[])
 	INS_AddInstrumentFunction(pin_instruction_handler, 0);
 //	PIN_AddFiniFunction(Fini, 0);
 	PIN_StartProgram();
+	PIN_InitLock(&lock);
 #else
 	for(i = 0; i < N_WORKLOAD; i++) {
 		printf("**** [%d] %s:	0x%lx ****\n",
