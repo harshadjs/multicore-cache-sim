@@ -1,0 +1,8 @@
+.cscope*
+*.o
+TAGS
+simulator.so
+run
+test
+pin.log
+
