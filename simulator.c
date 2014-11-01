@@ -107,6 +107,11 @@ cache_line_t *cache_load_shared(int core, uint64_t address)
 	int oldest, set;
 	dir_entry_t *dir_entry;
 
+	// TODO: access_page should be added here
+	// if it returns False, we go on as normal
+	// if it returns True, we skip the directory phase
+	// and only add it to our local cache
+
 	/*
 	 * Directory will search for the tag
 	 * if the entry is found, it will be returned
@@ -134,6 +139,11 @@ cache_line_t *cache_load_excl(int core, uint64_t address)
 {
 	int oldest, set;
 	dir_entry_t *dir_entry;
+
+	// TODO: access_page should be added here
+	// if it returns False, we go on as normal
+	// if it returns True, we skip the directory phase
+	// and only add it to our local cache
 
 	/*
 	 * Directory will search for the tag
@@ -293,6 +303,7 @@ int main(int argc, char *argv[])
 	unsigned int i;
 
 	directory_init();
+	page_table_init();
 
 #ifdef PINTOOL
 	PIN_InitSymbols();
