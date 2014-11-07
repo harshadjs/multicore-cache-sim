@@ -12,7 +12,7 @@ void pin_read_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
 	int core = PIN_ThreadId();
 
 	PIN_GetLock(&lock, PIN_ThreadId());
-	printf("{ MEM_READ, %d, 0x%lx },\n", core, addr);
+	//printf("{ MEM_READ, %d, 0x%lx },\n", core, addr);
 	cache_read(core, addr);
 	PIN_ReleaseLock(&lock);
 }
@@ -22,7 +22,7 @@ void pin_write_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
 	int core = PIN_ThreadId();
 
 	PIN_GetLock(&lock, PIN_ThreadId());
-	printf("{ MEM_WRITE, %d, 0x%lx },\n", core, addr);
+	//printf("{ MEM_WRITE, %d, 0x%lx },\n", core, addr);
 	cache_write(core, addr);
 	PIN_ReleaseLock(&lock);
 }

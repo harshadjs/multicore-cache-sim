@@ -7,6 +7,7 @@
 #endif
 #include "simulator.h"
 #include "directory.h"
+#include "private.h"
 
 #ifdef PINTOOL
 extern PIN_LOCK lock;
