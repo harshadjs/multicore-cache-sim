@@ -81,6 +81,21 @@ int find_lru_node(int core, int set)
 	return oldest;
 }
 
+/* Finds least recently used node in cache @core and set @set */
+int find_lru_node_or_exact_match(int core, int set, uint64_t address)
+{
+	int i;
+	uint64_t tag = cache_get_tag(address);
+
+	for(i = 0; i < N_LINES; i++) {
+	  if(cores[core].sets[set].lines[i].tag == tag) {
+		return i;
+	  }
+	}
+
+	return find_lru_node(core, set);
+}
+
 void cache_invalidate(int core, uint64_t address)
 {
 	int set = cache_get_set(address), i;
@@ -156,7 +171,7 @@ cache_line_t *cache_load_excl(int core, uint64_t address)
 
 	/* Replace in core's own cache */
 	set = cache_get_set(address);
-	oldest = find_lru_node(core, set);
+	oldest = find_lru_node_or_exact_match(core, set, address);
 	directory_delete_node(core, cache_get_tag_dir(set, cores[core].sets[set].lines[oldest].tag));
 
 	cores[core].sets[set].lines[oldest] = dir_entry->line;

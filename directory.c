@@ -4,12 +4,20 @@
 #include <string.h>
 #include "directory.h"
 
+// TODO
+// 1. Directory caches are usually 4-way associative (the impl
+//    now is fully associative)
+// 2. I dunno what the replacement policy should be.
+//    Right now the policy is, replace the least-shared one
+// 3. We need to implement private page bypass - when data is
+//    accessed privately, it should bypass directory storage
+
 /* Stats */
 extern int hits, misses, directory_transactions, directory_misses,
 	directory_hits, directory_invalidations, directory_excl_hits,
 	directory_shared_hits, directory_deletions;
 
-static directory_t dir;
+static directory_t dir[N_CORES];
 
 /* Hash table functions */
 
@@ -49,19 +57,52 @@ void invalidate_all(int core, dir_entry_t *entry)
 	}
 }
 
+// evicts a directory entry for a given core
+// OR if there is an entry with no cache presence, evict that instead 
+// the eviction policy is: remove the line being shared by the fewest 
+// cores (ties broken arbitrarily)
+void dir_evict(int core) {
+  ht_iter_t iter;
+  dir_entry_t *val;
+  dir_entry_t *evicted = 0;
+
+  for(ht_iter_init(&iter, dir[core].ht); ht_iter_data(&iter) != 0;
+	  ht_iter_next(&iter)) {
+	val = (dir_entry_t*)ht_iter_data(&iter);
+	if(evicted == 0) {
+	  evicted = val;
+	} else {
+	  if(val->ref_count < evicted->ref_count)
+		evicted = val;
+	}
+  }
+
+  // evicted line has been chosen - delete it
+  directory_deletions++;
+  ht_remove(dir[core].ht, evicted);
+  dir[core].count--;  
+}
+
 dir_entry_t *dir_get_shared(int core, uint64_t tag)
 {
 	dir_entry_t key, *val;
+	uint64_t index = DIR_GET_INDEX(tag);
 
-	tag = tag & DIR_TAG_MASK;
+	tag = DIR_GET_TAG(tag);
 
 	key.line.tag = tag;
 
 	directory_transactions++;
 
-	val = (dir_entry_t *)ht_search(dir.ht, &key);
+	val = (dir_entry_t *)ht_search(dir[index].ht, &key);
 	if((!val) ||
 	   (!DIR_IS_VALID(&val->line))) {
+
+	  if(dir[index].count >= MAX_DIR_ENTRIES) {
+		assert(dir[index].count == MAX_DIR_ENTRIES); 
+		dir_evict(index);
+	  }
+
 		val = (dir_entry_t *)malloc(sizeof(dir_entry_t));
 		memset(val, 0, sizeof(dir_entry_t));
 		val->line.tag = tag;
@@ -70,7 +111,8 @@ dir_entry_t *dir_get_shared(int core, uint64_t tag)
 		DIR_SET_PROCESSOR_BM(val, core);
 
 		directory_misses++;
-		ht_add(dir.ht, val);
+		ht_add(dir[index].ht, val);
+		dir[index].count++;
 		return val;
 	}
 
@@ -110,14 +152,17 @@ void directory_delete_node(int core, uint64_t tag)
 {
 	dir_entry_t key, *val;
 
+	uint64_t index = DIR_GET_INDEX(tag);
+
 	key.line.tag = tag;
-	val = (dir_entry_t *)ht_search(dir.ht, &key);
+	val = (dir_entry_t *)ht_search(dir[index].ht, &key);
 	if(!val)
 		return;
 	val->ref_count--;
 	if(val->ref_count == 0) {
 		directory_deletions++;
-		ht_remove(dir.ht, &key);
+		ht_remove(dir[index].ht, &key);
+		dir[index].count--;
 		return;
 	}
 
@@ -143,16 +188,23 @@ void directory_delete_node(int core, uint64_t tag)
 dir_entry_t *dir_get_excl(int core, uint64_t tag)
 {
 	dir_entry_t key, *val;
+	uint64_t index = DIR_GET_INDEX(tag);
 
 	directory_transactions++;
-	tag = tag & DIR_TAG_MASK;
+	tag = DIR_GET_TAG(tag);
 
 	key.line.tag = tag;
-	val = (dir_entry_t *)ht_search(dir.ht, &key);
+	val = (dir_entry_t *)ht_search(dir[index].ht, &key);
 
 	if((!val) ||
 	   (!DIR_IS_VALID(&val->line))) {
 		/* Invalid cache line */
+
+	  if(dir[index].count >= MAX_DIR_ENTRIES) {
+		assert(dir[index].count == MAX_DIR_ENTRIES); 
+		dir_evict(index);
+	  }
+
 		val = (dir_entry_t *)malloc(sizeof(dir_entry_t));
 		memset(val, 0, sizeof(dir_entry_t));
 
@@ -160,7 +212,8 @@ dir_entry_t *dir_get_excl(int core, uint64_t tag)
 		val->owner = core;
 		val->ref_count = 1;
 		DIR_SET_EXCLUSIVE(&val->line);
-		ht_add(dir.ht, val);
+		ht_add(dir[index].ht, val);
+		dir[index].count++;
 
 		directory_misses++;
 		return val;
@@ -200,6 +253,8 @@ dir_entry_t *dir_get_excl(int core, uint64_t tag)
 
 void directory_init(void)
 {
-	dir.ht = ht_create(23, dir_hash, dir_cmp, free);
-	dir.count = 0;
+  for(int i = 0; i < N_CORES; i++) {
+	dir[i].ht = ht_create(5749, dir_hash, dir_cmp, free);
+	dir[i].count = 0;
+  }
 }

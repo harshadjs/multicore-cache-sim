@@ -3,15 +3,6 @@
 #include "hash_table.h"
 #include "simulator.h"
 
-// Notes
-// 1. Directory needs a capacity below cache_size*cores
-// 2. Directory needs to be split (part of address decides which core to send it to)
-
-// page size: 4k
-#define PAGEOFF_BITS 12
-
-#define GET_PAGE_TAG(__addr) (__addr >> PAGEOFF_BITS)
-
 typedef struct {
   /* tag for this page */
   uint64_t tag;

@@ -4,15 +4,23 @@
 #include "hash_table.h"
 #include "dlist.h"
 
-#define N_SET_BITS 1
-#define N_TAG_BITS 28
+// Magny Cours from Cuesta has
+// 128k size cache per core ->
+// N_SETS*N_LINES = 128*1024
+// N_SET_BITS = 16
+#define N_SET_BITS 16
+#define N_TAG_BITS 13
 #define N_BLOCKOFF_BITS 3
+// page size: 4k
+#define PAGEOFF_BITS 12
 
 #define __MASK_TAG ((1 << (N_TAG_BITS)) - 1)
 #define MASK_TAG (__MASK_TAG << (N_BLOCKOFF_BITS + N_SET_BITS))
 
 #define __MASK_SET ((1 << (N_SET_BITS)) - 1)
 #define MASK_SET (__MASK_SET << N_BLOCKOFF_BITS)
+
+#define GET_PAGE_TAG(__addr) (__addr >> PAGEOFF_BITS)
 
 #define N_CORES 5
 #define N_SETS (1<<(N_SET_BITS))
