@@ -4,7 +4,6 @@
 #include "simulator.h"
 
 PIN_LOCK lock;
-int occupied;
 
 void dump_core_cache(int);
 void pin_read_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
@@ -21,12 +20,17 @@ void pin_write_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
 {
 	int core = PIN_ThreadId();
 
+	/*
+	 * Acquire a lock, so that no other thread interferes us.
+	 * Essentially, we are serializing the execution.
+	 */
 	PIN_GetLock(&lock, PIN_ThreadId());
 	//printf("{ MEM_WRITE, %d, 0x%lx },\n", core, addr);
 	cache_write(core, addr);
 	PIN_ReleaseLock(&lock);
 }
 
+/* Pin instruction handler: Called on execution of every instruction */
 void pin_instruction_handler(INS ins, void *v) {
 	ADDRINT iaddr = INS_Address(ins);
 

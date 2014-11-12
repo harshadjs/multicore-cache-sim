@@ -68,8 +68,13 @@ typedef struct {
 
 #define PRINT_STAT(__stat) printf("%s = %d\n", #__stat, __stat)
 
+/* Invalidate the cache line for a particular core*/
 void cache_invalidate(int , uint64_t);
+
+/* Read from a cache for a particular core */
 void cache_read(int, uint64_t);
+
+/* Write from a cache for a particular core */
 void cache_write(int, uint64_t);
 
 

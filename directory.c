@@ -19,26 +19,54 @@ extern int hits, misses, directory_transactions, directory_misses,
 
 static directory_t dir[N_CORES];
 
-/* Hash table functions */
-
-/* Compare function */
-static int dir_cmp(void *val1, void *val2)
+static dir_entry_t *dir_search(directory_t *dir, uint64_t address)
 {
-	cache_line_t *line1 = (cache_line_t *)val1;
-	cache_line_t *line2 = (cache_line_t *)val2;
+	int i;
+	dir_entry_t *p = NULL;
 
-	if(line1->tag == line2->tag)
-		return 0;
+	for(i = 0; i < DIR_NWAYS; i++) {
+		p = &dir->entries[DIR_GET_SET(address)][i];
 
-	return 1;
+		if((p->line.tag & DIR_TAG_MASK) == (address & DIR_TAG_MASK))
+			return p;
+	}
+
+	return NULL;
 }
 
-/* Hash function */
-static int dir_hash(void *data)
+static int dir_remove(directory_t *dir, uint64_t address)
 {
-	cache_line_t *line = (cache_line_t *)data;
+	dir_entry_t *p = dir_search(dir, address);
 
-	return (int)(line->tag);
+	/* Mark as invalid! */
+	if(!p)
+		return 1; /* Should not happen */
+
+	SET_INVALID(&p->line);
+	return 0;
+}
+
+/**
+ * This function assumes that there is a free slot *ALWAYS*. So,
+ * if not sure, must always call dir_evict before calling this function.
+ */
+static int dir_add(directory_t *dir, dir_entry_t *entry)
+{
+	int i;
+	dir_entry_t *p = NULL;
+
+	for(i = 0; i < DIR_NWAYS; i++) {
+		p = &dir->entries[DIR_GET_SET(entry->line.tag)][i];
+
+		if(!IS_VALID(&p->line)) {
+			/* empty line found */
+			break;
+		}
+	}
+
+	*p = *entry;
+
+	return 0;
 }
 
 /*
@@ -58,49 +86,58 @@ void invalidate_all(int core, dir_entry_t *entry)
 }
 
 // evicts a directory entry for a given core
-// OR if there is an entry with no cache presence, evict that instead 
-// the eviction policy is: remove the line being shared by the fewest 
+// OR if there is an entry with no cache presence, evict that instead
+// the eviction policy is: remove the line being shared by the fewest
 // cores (ties broken arbitrarily)
-void dir_evict(int core) {
-  ht_iter_t iter;
-  dir_entry_t *val;
-  dir_entry_t *evicted = 0;
+void dir_evict(int core, uint64_t tag)
+{
+	dir_entry_t *val;
+	dir_entry_t *evicted = 0;
+	int i;
 
-  for(ht_iter_init(&iter, dir[core].ht); ht_iter_data(&iter) != 0;
-	  ht_iter_next(&iter)) {
-	val = (dir_entry_t*)ht_iter_data(&iter);
-	if(evicted == 0) {
-	  evicted = val;
-	} else {
-	  if(val->ref_count < evicted->ref_count)
-		evicted = val;
+	for(i = 0; i < DIR_NWAYS; i++) {
+		val = &dir->entries[DIR_GET_SET(tag)][i];
+
+		if(evicted == 0) {
+			evicted = val;
+		} else if(val->ref_count < evicted->ref_count) {
+				evicted = val;
+		}
+
+		if(!IS_VALID(&val->line)) {
+			evicted = val;
+			break;
+		}
 	}
-  }
 
-  // evicted line has been chosen - delete it
-  directory_deletions++;
-  ht_remove(dir[core].ht, evicted);
-  dir[core].count--;  
+	// evicted line has been chosen - delete it
+	directory_deletions++;
+	SET_INVALID(&evicted->line);
+	dir[core].count--;
 }
 
+/**
+ * dir_get_shared:
+ * Get shared access from directory
+ * @args	core: Core
+ * @args	tag: tag / address
+ */
 dir_entry_t *dir_get_shared(int core, uint64_t tag)
 {
-	dir_entry_t key, *val;
+	dir_entry_t *val;
 	uint64_t index = DIR_GET_INDEX(tag);
 
 	tag = DIR_GET_TAG(tag);
 
-	key.line.tag = tag;
-
 	directory_transactions++;
 
-	val = (dir_entry_t *)ht_search(dir[index].ht, &key);
+	val = dir_search(&dir[index], tag);
 	if((!val) ||
 	   (!DIR_IS_VALID(&val->line))) {
 
 	  if(dir[index].count >= MAX_DIR_ENTRIES) {
 		assert(dir[index].count == MAX_DIR_ENTRIES); 
-		dir_evict(index);
+		dir_evict(index, tag);
 	  }
 
 		val = (dir_entry_t *)malloc(sizeof(dir_entry_t));
@@ -111,7 +148,7 @@ dir_entry_t *dir_get_shared(int core, uint64_t tag)
 		DIR_SET_PROCESSOR_BM(val, core);
 
 		directory_misses++;
-		ht_add(dir[index].ht, val);
+		dir_add(&dir[index], val);
 		dir[index].count++;
 		return val;
 	}
@@ -148,20 +185,24 @@ dir_entry_t *dir_get_shared(int core, uint64_t tag)
 	return NULL;
 }
 
+/**
+ * dir_delete_node:
+ * Delete node from directory
+ * @args	core: Core
+ * @args	tag: tag / address
+ */
 void directory_delete_node(int core, uint64_t tag)
 {
-	dir_entry_t key, *val;
-
+	dir_entry_t *val;
 	uint64_t index = DIR_GET_INDEX(tag);
 
-	key.line.tag = tag;
-	val = (dir_entry_t *)ht_search(dir[index].ht, &key);
+	val = dir_search(&dir[index], tag);
 	if(!val)
 		return;
 	val->ref_count--;
 	if(val->ref_count == 0) {
 		directory_deletions++;
-		ht_remove(dir[index].ht, &key);
+		dir_remove(&dir[index], tag);
 		dir[index].count--;
 		return;
 	}
@@ -187,14 +228,13 @@ void directory_delete_node(int core, uint64_t tag)
  */
 dir_entry_t *dir_get_excl(int core, uint64_t tag)
 {
-	dir_entry_t key, *val;
+	dir_entry_t *val;
 	uint64_t index = DIR_GET_INDEX(tag);
 
 	directory_transactions++;
 	tag = DIR_GET_TAG(tag);
 
-	key.line.tag = tag;
-	val = (dir_entry_t *)ht_search(dir[index].ht, &key);
+	val = dir_search(&dir[index], tag);
 
 	if((!val) ||
 	   (!DIR_IS_VALID(&val->line))) {
@@ -202,7 +242,7 @@ dir_entry_t *dir_get_excl(int core, uint64_t tag)
 
 	  if(dir[index].count >= MAX_DIR_ENTRIES) {
 		assert(dir[index].count == MAX_DIR_ENTRIES); 
-		dir_evict(index);
+		dir_evict(index, tag);
 	  }
 
 		val = (dir_entry_t *)malloc(sizeof(dir_entry_t));
@@ -212,7 +252,7 @@ dir_entry_t *dir_get_excl(int core, uint64_t tag)
 		val->owner = core;
 		val->ref_count = 1;
 		DIR_SET_EXCLUSIVE(&val->line);
-		ht_add(dir[index].ht, val);
+		dir_add(&dir[index], val);
 		dir[index].count++;
 
 		directory_misses++;
@@ -254,7 +294,7 @@ dir_entry_t *dir_get_excl(int core, uint64_t tag)
 void directory_init(void)
 {
   for(int i = 0; i < N_CORES; i++) {
-	dir[i].ht = ht_create(5749, dir_hash, dir_cmp, free);
+//	dir[i].ht = ht_create(5749, dir_hash, dir_cmp, free);
 	dir[i].count = 0;
   }
 }

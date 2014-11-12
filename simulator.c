@@ -26,7 +26,7 @@ uint32_t ticks;
 cache_t cores[N_CORES];
 
 #ifdef PINTOOL
-#define printf(...)
+//#define printf(...)
 #endif
 
 void dump_core_cache(int core)
@@ -43,6 +43,11 @@ void dump_core_cache(int core)
 		printf("\n");
 	}
 	printf("-------------------\n");
+}
+
+void dump_line(cache_line_t *line)
+{
+	printf("[%lx :%d:]\n", line->tag, line->state);
 }
 
 inline int cache_get_set(uint64_t address)
@@ -237,23 +242,21 @@ void cache_read(int core, uint64_t address)
 {
 	cache_line_t *line;
 
-	dump_core_cache(0);
-	dump_core_cache(1);
-	dump_core_cache(2);
-	dump_core_cache(3);
+	printf("[%d]\tRD: ", core);
 	/* Do I have shared / exclusive access for this address? */
 	line = cache_search_shared(core, address);
 	if(!line) {
 		/* Get shared access */
 		line = cache_load_shared(core, address);
 	}
+	dump_line(line);
 }
 
 void cache_write(int core, uint64_t address)
 {
 	cache_line_t *line;
 
-	dump_core_cache(0);
+	printf("[%d]\tWR: ", core);
 	/* Do I have exclusive access for this address? */
 	line = cache_search_excl(core, address);
 	if(!line) {
@@ -261,6 +264,7 @@ void cache_write(int core, uint64_t address)
 		line = cache_load_excl(core, address);
 	} else {
 	}
+	dump_line(line);
 }
 
 workload_t workload[] = {
@@ -314,6 +318,21 @@ void print_changed_stats(void)
 	old_hits = hits;
 }
 
+#ifdef PINTOOL
+void pin_finish(int code, void *v)
+{
+	PRINT_STAT(hits);
+	PRINT_STAT(misses);
+	PRINT_STAT(directory_transactions);
+	PRINT_STAT(directory_misses);
+	PRINT_STAT(directory_hits);
+	PRINT_STAT(directory_invalidations);
+	PRINT_STAT(directory_excl_hits);
+	PRINT_STAT(directory_shared_hits);
+	PRINT_STAT(directory_deletions);
+}
+#endif
+
 int main(int argc, char *argv[])
 {
 	unsigned int i;
@@ -328,9 +347,9 @@ int main(int argc, char *argv[])
 	}
 
 	INS_AddInstrumentFunction(pin_instruction_handler, 0);
-//	PIN_AddFiniFunction(Fini, 0);
-	PIN_StartProgram();
+	PIN_AddFiniFunction(pin_finish, 0);
 	PIN_InitLock(&lock);
+	PIN_StartProgram();
 #else
 	for(i = 0; i < N_WORKLOAD; i++) {
 		printf("**** [%d] %s:	0x%lx ****\n",
@@ -343,8 +362,6 @@ int main(int argc, char *argv[])
 		}
 		print_changed_stats();
 	}
-#endif
-
 	PRINT_STAT(hits);
 	PRINT_STAT(misses);
 	PRINT_STAT(directory_transactions);
@@ -354,6 +371,8 @@ int main(int argc, char *argv[])
 	PRINT_STAT(directory_excl_hits);
 	PRINT_STAT(directory_shared_hits);
 	PRINT_STAT(directory_deletions);
+
+#endif
 
 	return 0;
 }

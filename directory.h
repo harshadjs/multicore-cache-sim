@@ -4,7 +4,14 @@
 #include "simulator.h"
 
 #define DIR_TAG_MASK (MASK_TAG | MASK_SET)
-#define DIR_GET_TAG(addr) (addr & DIR_TAG_MASK)
+#define DIR_GET_TAG(addr) ((addr) & DIR_TAG_MASK)
+
+#define DIR_SET_BITS 2
+#define DIR_NWAYS 4
+#define DIR_NSETS (1 << (DIR_SET_BITS))
+
+#define DIR_SET_MASK ((DIR_NSETS) - 1)
+#define DIR_GET_SET(__addr) (((__addr) >> N_BLOCKOFF_BITS) & (DIR_SET_MASK))
 
 #define DIR_COVERAGE_RATIO 2
 #define MAX_DIR_ENTRIES N_CORES*N_SETS*N_LINES*DIR_COVERAGE_RATIO
@@ -51,7 +58,7 @@ typedef struct {
 
 typedef struct {
 	/* Hash table of directory entries - contains cache lines */
-	ht_t *ht;
+	dir_entry_t entries[DIR_NSETS][DIR_NWAYS];
 
 	/* Total number of lines in the directory */
 	int count;
