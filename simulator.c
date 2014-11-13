@@ -20,7 +20,7 @@ int hits, misses, directory_transactions, directory_misses,
 
 
 /* Global virtual clock */
-uint32_t ticks;
+uint64_t ticks;
 
 /* Cache array */
 cache_t cores[N_CORES];
@@ -77,7 +77,7 @@ int find_lru_node(int core, int set)
 		}
 	}
 
-	printf("oldest = %d\n", oldest);
+	//printf("oldest = %d\n", oldest);
 	return oldest;
 }
 
@@ -195,14 +195,14 @@ cache_line_t *cache_search_shared(int core, uint64_t address)
 {
 	int i;
 
-	printf("Searching shared: in set %d, tag exp: %lx\n",
-		   cache_get_set(address),
-		   cache_get_tag(address));
+	//printf("Searching shared: in set %d, tag exp: %lx\n",
+	//     cache_get_set(address),
+	//	   cache_get_tag(address));
 	for(i = 0; i < N_LINES; i++) {
 		cache_line_t *line;
 
 		line = &cores[core].sets[cache_get_set(address)].lines[i];
-		printf("==>%lx, %d\n", line->tag, line->state);
+		//printf("==>%lx, %d\n", line->tag, line->state);
 		if((IS_VALID(line)) &&
 		   ((line->tag) & MASK_TAG) == cache_get_tag(address)) {
 
@@ -247,21 +247,26 @@ void cache_read(int core, uint64_t address)
 {
 	cache_line_t *line;
 
-	printf("[%d]\tRD: ", core);
+	// for now, just tick on every read/write, lamport clock style
+	ticks++;
+	//printf("[%d]\tRD: ", core);
 	/* Do I have shared / exclusive access for this address? */
 	line = cache_search_shared(core, address);
 	if(!line) {
 		/* Get shared access */
 		line = cache_load_shared(core, address);
 	}
-	dump_line(line);
+	//dump_line(line);
+	line->ticks = ticks;
 }
 
 void cache_write(int core, uint64_t address)
 {
 	cache_line_t *line;
 
-	printf("[%d]\tWR: ", core);
+	// for now, just tick on every read/write, lamport clock style
+	ticks++;
+	//printf("[%d]\tWR: ", core);
 	/* Do I have exclusive access for this address? */
 	line = cache_search_excl(core, address);
 	if(!line) {
@@ -269,7 +274,8 @@ void cache_write(int core, uint64_t address)
 		line = cache_load_excl(core, address);
 	} else {
 	}
-	dump_line(line);
+	//dump_line(line);
+	line->ticks = ticks;
 }
 
 workload_t workload[] = {
@@ -357,15 +363,15 @@ int main(int argc, char *argv[])
 	PIN_StartProgram();
 #else
 	for(i = 0; i < N_WORKLOAD; i++) {
-		printf("**** [%d] %s:	0x%lx ****\n",
-			   workload[i].core, workload[i].type == MEM_READ ?
-			   "MEM_READ" : "MEM_WRITE", workload[i].address);
+	  //printf("**** [%d] %s:	0x%lx ****\n",
+	  //	   workload[i].core, workload[i].type == MEM_READ ?
+	  //	   "MEM_READ" : "MEM_WRITE", workload[i].address);
 		if(workload[i].type == MEM_READ) {
 			cache_read(workload[i].core, workload[i].address);
 		} else {
 			cache_write(workload[i].core, workload[i].address);
 		}
-		print_changed_stats();
+		//print_changed_stats();
 	}
 	PRINT_STAT(hits);
 	PRINT_STAT(misses);

@@ -3,7 +3,10 @@
 #include "hash_table.h"
 #include "simulator.h"
 
-#define DIR_SET_BITS 10
+// 256k directory = 
+// 4*2^16
+// coverage ratio of 2
+#define DIR_SET_BITS 16
 #define DIR_NWAYS 4
 #define DIR_NSETS (1 << (DIR_SET_BITS))
 

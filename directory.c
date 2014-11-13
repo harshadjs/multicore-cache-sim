@@ -51,7 +51,6 @@ dir_entry_t *dir_evict(int core, uint64_t address)
 	dir_entry_t *val;
 	dir_entry_t *evicted = 0;
 	int i;
-	uint64_t dirtag = DIR_GET_TAG(address);
 
 	for(i = 0; i < DIR_NWAYS; i++) {
 		val = &dir->entries[DIR_GET_SET(address)][i];
@@ -162,7 +161,7 @@ void directory_delete_node(int core, uint64_t address)
 	uint64_t dirtag = DIR_GET_TAG(address);
 
 	for(i = 0; i < DIR_NWAYS; i++) {
-		val = &dir->entries[DIR_GET_SET(address)][i];
+	  val = &(dir[index].entries[DIR_GET_SET(address)][i]);
 		if(val->dirtag == dirtag)
 		  break;
 	}

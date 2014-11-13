@@ -34,7 +34,7 @@ enum {
 
 typedef struct {
 	uint64_t tag;
-	uint32_t ticks;
+	uint64_t ticks;
 	uint8_t state;
 } cache_line_t;
 
