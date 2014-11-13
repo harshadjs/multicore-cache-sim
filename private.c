@@ -50,9 +50,7 @@ bool access_page(int core, uint64_t addr)
 		// This is how pages become permanently shared,
 		// and enter into the directory protocol
 		val->priv = false;
-		// Not entirely sure what to do here: invalidate all existing cache
-		// lines for this page? That should be safe, if not efficient
-		// TODO: figure out what to do here		
+		cache_invalidate(val->owner, addr);
 		return false;
 	  }
 	} else {

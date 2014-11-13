@@ -60,11 +60,6 @@ inline uint64_t cache_get_tag(uint64_t address)
 	return (address & MASK_TAG);
 }
 
-inline uint64_t cache_get_tag_dir(int set, uint64_t tag)
-{
-	return (tag) | (set << N_BLOCKOFF_BITS);
-}
-
 /* Finds least recently used node in cache @core and set @set */
 int find_lru_node(int core, int set)
 {
@@ -93,7 +88,8 @@ int find_lru_node_or_exact_match(int core, int set, uint64_t address)
 	uint64_t tag = cache_get_tag(address);
 
 	for(i = 0; i < N_LINES; i++) {
-	  if(cores[core].sets[set].lines[i].tag == tag) {
+	  if(IS_VALID(&cores[core].sets[set].lines[i]) && 
+		 cores[core].sets[set].lines[i].tag == tag) {
 		return i;
 	  }
 	}
@@ -114,9 +110,25 @@ void cache_invalidate(int core, uint64_t address)
 
 		if((tag == line->tag) && (IS_VALID(line))) {
 			/* throw it away */
-			directory_invalidations++;
-			directory_delete_node(core, address);
 			SET_INVALID(line);
+			return;
+		}
+	}
+}
+
+void cache_downgrade(int core, uint64_t address)
+{
+	int set = cache_get_set(address), i;
+	cache_line_t *line;
+	uint64_t tag;
+
+	tag = cache_get_tag(address);
+
+	for(i = 0; i < N_LINES; i++) {
+		line = &cores[core].sets[set].lines[i];
+
+		if((tag == line->tag) && (IS_VALID(line))) {
+			SET_SHARED(line);
 			return;
 		}
 	}
@@ -126,32 +138,27 @@ void cache_invalidate(int core, uint64_t address)
 cache_line_t *cache_load_shared(int core, uint64_t address)
 {
 	int oldest, set;
-	dir_entry_t *dir_entry;
+	bool priv_page;
 
-	// TODO: access_page should be added here
-	// if it returns False, we go on as normal
-	// if it returns True, we skip the directory phase
-	// and only add it to our local cache
+	// priv_page is True if we have private access to this page
+	// i.e. no directory lookup needed
+	// priv_page is False if the page is shared
+	// i.e. normal operation: use the directory
+	priv_page = access_page(core, address);
 
-	/*
-	 * Directory will search for the tag
-	 * if the entry is found, it will be returned
-	 * Otherwise new entry will be created and that will be returned
-	 * In any case, directory will never return NULL.
-	 */
-	dir_entry = dir_get_shared(core, address);
+	if(!priv_page) {
+	  dir_get_shared(core, address);
+	} 
 
-	/* Mark that this processor has t1he entry */
-	DIR_SET_PROCESSOR_BM(dir_entry, core);
-
-	/* Replace in core's own cache */
 	set = cache_get_set(address);
 	oldest = find_lru_node(core, set);
-	directory_delete_node(core, cache_get_tag_dir(set, cores[core].sets[set].lines[oldest].tag));
-
-	cores[core].sets[set].lines[oldest] = dir_entry->line;
-	cores[core].sets[set].lines[oldest].tag &= MASK_TAG;
-
+	if(IS_VALID(&cores[core].sets[set].lines[oldest]) && 
+	   (cores[core].sets[set].lines[oldest].tag != (MASK_TAG & address))) {
+	  directory_delete_node(core, address);
+	}
+	cores[core].sets[set].lines[oldest].tag = MASK_TAG & address;
+	SET_EXCLUSIVE(&(cores[core].sets[set].lines[oldest]));
+	
 	return &cores[core].sets[set].lines[oldest];
 }
 
@@ -159,29 +166,27 @@ cache_line_t *cache_load_shared(int core, uint64_t address)
 cache_line_t *cache_load_excl(int core, uint64_t address)
 {
 	int oldest, set;
-	dir_entry_t *dir_entry;
+	bool priv_page;
 
-	// TODO: access_page should be added here
-	// if it returns False, we go on as normal
-	// if it returns True, we skip the directory phase
-	// and only add it to our local cache
+	// priv_page is True if we have private access to this page
+	// i.e. no directory lookup needed
+	// priv_page is False if the page is shared
+	// i.e. normal operation: use the directory
+	priv_page = access_page(core, address);
 
-	/*
-	 * Directory will search for the tag
-	 * if the entry is found, it will be returned
-	 * Otherwise new entry will be created and that will be returned
-	 * In any case, directory will never return NULL.
-	 */
-	dir_entry = dir_get_excl(core, address);
+	if(!priv_page) {
+	  dir_get_excl(core, address);
+	} 
 
-	/* Replace in core's own cache */
 	set = cache_get_set(address);
 	oldest = find_lru_node_or_exact_match(core, set, address);
-	directory_delete_node(core, cache_get_tag_dir(set, cores[core].sets[set].lines[oldest].tag));
-
-	cores[core].sets[set].lines[oldest] = dir_entry->line;
-	cores[core].sets[set].lines[oldest].tag &= MASK_TAG;
-
+	if(IS_VALID(&cores[core].sets[set].lines[oldest]) && 
+	   (cores[core].sets[set].lines[oldest].tag != (MASK_TAG & address))) {
+	  directory_delete_node(core, address);
+	}
+	cores[core].sets[set].lines[oldest].tag = MASK_TAG & address;
+	SET_EXCLUSIVE(&(cores[core].sets[set].lines[oldest]));
+	
 	return &cores[core].sets[set].lines[oldest];
 }
 

@@ -71,6 +71,9 @@ typedef struct {
 /* Invalidate the cache line for a particular core*/
 void cache_invalidate(int , uint64_t);
 
+/* Downgrade the cache line from exclusive to shared for a particular core*/
+void cache_downgrade(int , uint64_t);
+
 /* Read from a cache for a particular core */
 void cache_read(int, uint64_t);
 
