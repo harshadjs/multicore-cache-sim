@@ -8,9 +8,10 @@
 // 128k size cache per core ->
 // N_SETS*N_LINES = 128*1024
 // N_SET_BITS = 16
+// blocksize = 64 bytes = 2^6
 #define N_SET_BITS 16
-#define N_TAG_BITS 13
-#define N_BLOCKOFF_BITS 3
+#define N_BLOCKOFF_BITS 6
+#define N_TAG_BITS (32-N_SET_BITS-N_BLOCKOFF_BITS)
 // page size: 4k
 #define PAGEOFF_BITS 12
 

@@ -341,6 +341,7 @@ void pin_finish(int code, void *v)
 	PRINT_STAT(directory_excl_hits);
 	PRINT_STAT(directory_shared_hits);
 	PRINT_STAT(directory_deletions);
+	print_false_sharing_report();
 }
 #endif
 

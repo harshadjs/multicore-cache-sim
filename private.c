@@ -37,6 +37,10 @@ bool access_page(int core, uint64_t addr)
 	val->owner = core;
 	val->tag = tag;
 	val->priv = true;
+	for(int i=0; i < LINES_PER_PAGE; i++) {
+	  val->line_bm[i] = 0;
+	}
+	PAGE_SET_PROCESSOR_BM(val, core, addr);
 	ht_add(pt.ht, val);
 
 	return true;
@@ -44,6 +48,7 @@ bool access_page(int core, uint64_t addr)
 	if(val->priv) {
 	  if(val->owner == core) {
 		// pt entry owned by this core
+		PAGE_SET_PROCESSOR_BM(val, core, addr);
 		return true;
 	  } else {
 		// pt entry owned by other code
@@ -51,16 +56,55 @@ bool access_page(int core, uint64_t addr)
 		// and enter into the directory protocol
 		val->priv = false;
 		cache_invalidate(val->owner, addr);
+		PAGE_SET_PROCESSOR_BM(val, core, addr);
 		return false;
 	  }
 	} else {
 	  // pt entry shared
 	  // nothing special to do
+	  PAGE_SET_PROCESSOR_BM(val, core, addr);
 	  return false;
 	}
   }
 }
 
+// old trick to find if there are at least 2 1's in a bitmask
+bool shared(int bitmask) {
+  return ((bitmask-1) & bitmask) != 0;
+}
+
+void print_false_sharing_report(void)
+{
+  ht_iter_t iter;
+  int priv_pages=0, shared_pages=0;
+  int priv_blocks=0, shared_blocks=0;
+  pt_entry_t *entry;
+
+  for(ht_iter_init(&iter, pt.ht); ht_iter_data(&iter); ht_iter_next(&iter)) {
+	entry = (pt_entry_t *)ht_iter_data(&iter);
+	if(entry->priv) {
+	  priv_pages++;
+	} else {
+	  shared_pages++;
+	}
+	for(int i=0; i < LINES_PER_PAGE; i++) {
+	  if(shared(entry->line_bm[i])) {
+		shared_blocks++;
+	  } else {
+		priv_blocks++;
+	  }
+	}
+  }
+
+  printf("Private Pages: %d\n", priv_pages);
+  printf("Shared Pages: %d\n", shared_pages);
+  printf("Page Privacy: %.2f%%\n", 
+		 (100.0*priv_pages)/(priv_pages+shared_pages));
+  printf("Private Blocks: %d\n", priv_blocks);
+  printf("Shared Blocks: %d\n", shared_blocks);
+  printf("Block Privacy: %.2f%%\n", 
+		 (100.0*priv_blocks)/(priv_blocks+shared_blocks));
+}
 
 void page_table_init(void)
 {
