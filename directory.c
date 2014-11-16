@@ -100,7 +100,7 @@ static dir_entry_t *dir_search(directory_t *dir, int core, uint64_t address)
  * @args	core: Core
  * @args	tag: tag / address
  */
-void dir_get_shared(int core, uint64_t address)
+int dir_get_shared(int core, uint64_t address)
 {
 	dir_entry_t *val;
 	uint64_t index = DIR_GET_INDEX(address);
@@ -116,14 +116,14 @@ void dir_get_shared(int core, uint64_t address)
 	  directory_shared_hits++;
 	  if(val->owner == core && val->ref_count == 1) {
 		// we already own it
-		return;
+		return DIR_ACCESS_EXCL;
 	  } else {
 		if(val->ref_count > 1) {
 		  // it is shared
 		  // add ourselves
 		  val->ref_count++;
 		  DIR_SET_PROCESSOR_BM(val, core);
-		  return;
+		  return DIR_ACCESS_SHARED;
 		} else {
 		  // someone else owns it
 		  // make it shared
@@ -131,7 +131,7 @@ void dir_get_shared(int core, uint64_t address)
 		  val->ref_count++;
 		  downgrade_all(val, address);
 		  DIR_SET_PROCESSOR_BM(val, core);
-		  return;
+		  return DIR_ACCESS_SHARED;
 		}
 	  }
 	} else {
@@ -143,7 +143,7 @@ void dir_get_shared(int core, uint64_t address)
 	  val->valid = true;
 	  val->shared_bm = 0;
 	  DIR_SET_PROCESSOR_BM(val, core);
-	  return;
+	  return DIR_ACCESS_EXCL;
 	}
 }
 

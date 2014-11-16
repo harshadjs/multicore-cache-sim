@@ -137,7 +137,7 @@ void cache_downgrade(int core, uint64_t address)
 /* Local cache miss: Shared access requested */
 cache_line_t *cache_load_shared(int core, uint64_t address)
 {
-	int oldest, set;
+	int oldest, set, access_level;
 	bool priv_page;
 
 	// priv_page is True if we have private access to this page
@@ -147,18 +147,25 @@ cache_line_t *cache_load_shared(int core, uint64_t address)
 	priv_page = access_page(core, address);
 
 	if(!priv_page) {
-	  dir_get_shared(core, address);
-	} 
+		/* Directory can give SHARED/EXCL access */
+		access_level = dir_get_shared(core, address);
+	} else {
+		access_level = DIR_ACCESS_EXCL;
+	}
 
 	set = cache_get_set(address);
 	oldest = find_lru_node(core, set);
-	if(IS_VALID(&cores[core].sets[set].lines[oldest]) && 
+	if(IS_VALID(&cores[core].sets[set].lines[oldest]) &&
 	   (cores[core].sets[set].lines[oldest].tag != (MASK_TAG & address))) {
 	  directory_delete_node(core, address);
 	}
 	cores[core].sets[set].lines[oldest].tag = MASK_TAG & address;
-	SET_EXCLUSIVE(&(cores[core].sets[set].lines[oldest]));
-	
+
+	if(access_level == DIR_ACCESS_EXCL)
+		SET_EXCLUSIVE(&(cores[core].sets[set].lines[oldest]));
+	else
+		SET_SHARED(&(cores[core].sets[set].lines[oldest]));
+
 	return &cores[core].sets[set].lines[oldest];
 }
 
@@ -175,6 +182,7 @@ cache_line_t *cache_load_excl(int core, uint64_t address)
 	priv_page = access_page(core, address);
 
 	if(!priv_page) {
+		/* Directory Must give us exclusive access */
 	  dir_get_excl(core, address);
 	} 
 

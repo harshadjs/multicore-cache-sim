@@ -56,7 +56,13 @@ typedef struct {
 }directory_t;
 
 void directory_init(void);
-void dir_get_shared(int core, uint64_t tag);
+/* Directory access levels granted by dir_get_shared function */
+enum {
+	DIR_ACCESS_SHARED,
+	DIR_ACCESS_EXCL,
+};
+
+int dir_get_shared(int core, uint64_t tag);
 void dir_get_excl(int core, uint64_t tag);
 void directory_delete_node(int core, uint64_t tag);
 
