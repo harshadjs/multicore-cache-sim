@@ -1,3 +1,4 @@
+#ifdef PRIVATE_TRACKING
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
@@ -10,7 +11,7 @@ static int page_cmp(void *val1, void *val2)
 {
   uint64_t *tag1 = (uint64_t*)val1;
   uint64_t *tag2 = (uint64_t*)val2;
-  
+
   if(*tag1 == *tag2)
 	return 0;
 
@@ -110,3 +111,4 @@ void page_table_init(void)
 {
   pt.ht = ht_create(101, page_hash, page_cmp, free);
 }
+#endif

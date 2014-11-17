@@ -17,6 +17,7 @@ extern PIN_LOCK lock;
 int hits, misses, directory_transactions, directory_misses,
 	directory_hits, directory_invalidations, directory_excl_hits,
 	directory_shared_hits, directory_deletions;
+int misses_per_core[N_CORES];
 
 
 /* Global virtual clock */
@@ -138,6 +139,7 @@ void cache_downgrade(int core, uint64_t address)
 cache_line_t *cache_load_shared(int core, uint64_t address)
 {
 	int oldest, set, access_level;
+#ifdef PRIVATE_TRACKING
 	bool priv_page;
 
 	// priv_page is True if we have private access to this page
@@ -152,6 +154,9 @@ cache_line_t *cache_load_shared(int core, uint64_t address)
 	} else {
 		access_level = DIR_ACCESS_EXCL;
 	}
+#else
+	access_level = dir_get_shared(core, address);
+#endif
 
 	set = cache_get_set(address);
 	oldest = find_lru_node(core, set);
@@ -173,6 +178,7 @@ cache_line_t *cache_load_shared(int core, uint64_t address)
 cache_line_t *cache_load_excl(int core, uint64_t address)
 {
 	int oldest, set;
+#ifdef PRIVATE_TRACKING
 	bool priv_page;
 
 	// priv_page is True if we have private access to this page
@@ -186,6 +192,9 @@ cache_line_t *cache_load_excl(int core, uint64_t address)
 	  dir_get_excl(core, address);
 	} 
 
+#else
+	dir_get_excl(core, address);
+#endif
 	set = cache_get_set(address);
 	oldest = find_lru_node_or_exact_match(core, set, address);
 	if(IS_VALID(&cores[core].sets[set].lines[oldest]) && 
@@ -224,6 +233,7 @@ cache_line_t *cache_search_shared(int core, uint64_t address)
 	}
 
 	misses++;
+	misses_per_core[core]++;
 	return NULL;
 }
 
@@ -248,6 +258,7 @@ cache_line_t *cache_search_excl(int core, uint64_t address)
 	}
 
 	misses++;
+	misses_per_core[core]++;
 	return NULL;
 }
 
@@ -340,6 +351,8 @@ void print_changed_stats(void)
 #ifdef PINTOOL
 void pin_finish(int code, void *v)
 {
+	int i;
+
 	PRINT_STAT(hits);
 	PRINT_STAT(misses);
 	PRINT_STAT(directory_transactions);
@@ -349,7 +362,12 @@ void pin_finish(int code, void *v)
 	PRINT_STAT(directory_excl_hits);
 	PRINT_STAT(directory_shared_hits);
 	PRINT_STAT(directory_deletions);
+	for(i = 0; i < N_CORES; i++) {
+		printf("Misses on core %d = %d\n", i, misses_per_core[i]);
+	}
+#ifdef PRIVATE_TRACKING
 	print_false_sharing_report();
+#endif
 }
 #endif
 
@@ -358,7 +376,9 @@ int main(int argc, char *argv[])
 	unsigned int i;
 
 	directory_init();
+#ifdef PRIVATE_TRACKING
 	page_table_init();
+#endif
 
 #ifdef PINTOOL
 	PIN_InitSymbols();

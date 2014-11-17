@@ -1,3 +1,4 @@
+#ifdef PRIVATE_TRACKING
 #ifndef __PRIVATE_H__
 #define __PRIVATE_H__
 #include "hash_table.h"
@@ -43,4 +44,5 @@ bool access_page(int core, uint64_t addr);
 void page_table_init(void);
 void print_false_sharing_report(void);
 
+#endif
 #endif
