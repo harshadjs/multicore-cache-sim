@@ -22,11 +22,11 @@ struct my_page pages[N_PAGES_PER_THREAD * N_THREADS];
 
 void *thread_function(void *arg)
 {
-	int i, j, my_id = (int)(long)arg;
+	int i, j;
 
-	for(i = 0; i < N_PAGES_PER_THREAD; i++)
+	for(i = 0; i < N_PAGES_PER_THREAD * N_THREADS; i++)
 		for(j = 0; j < PAGE_SIZ; j++)
-			pages[(my_id * N_PAGES_PER_THREAD) + i].data[j]++;
+			pages[i].data[j]++;
 
 	return NULL;
 }
