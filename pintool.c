@@ -8,7 +8,7 @@ PIN_LOCK lock;
 void dump_core_cache(int);
 void pin_read_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
 {
-	int core = PIN_ThreadId();
+	int core = PIN_ThreadId() % N_CORES;
 
 	PIN_GetLock(&lock, PIN_ThreadId());
 	//printf("{ MEM_READ, %d, 0x%lx },\n", core, addr);
@@ -18,7 +18,7 @@ void pin_read_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
 
 void pin_write_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
 {
-	int core = PIN_ThreadId();
+	int core = PIN_ThreadId() % N_CORES;
 
 	/*
 	 * Acquire a lock, so that no other thread interferes us.

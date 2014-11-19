@@ -36,7 +36,6 @@ OUTOPT = -o
 LINK_OUT = -o
 TOOLS = $(TOOL_ROOTS:%=%$(PINTOOL_SUFFIX)) test
 
-CFLAGS=${CXXFLAGS} -g -I${PIN_SRC}
 
 include $(CONFIG)
 
@@ -47,6 +46,8 @@ endif
 ifeq ($(PRIVATE_TRACKING), 1)
 CFLAGS += -DPRIVATE_TRACKING
 endif
+
+CFLAGS+=${CXXFLAGS} -g -I${PIN_SRC}
 
 ## build rules
 
