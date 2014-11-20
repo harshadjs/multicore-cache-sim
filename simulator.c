@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <fcntl.h>
 #include <stdint.h>
 #ifdef PINTOOL
 #include "pintool.h"
@@ -371,6 +372,7 @@ void pin_finish(int code, void *v)
 }
 #endif
 
+
 int main(int argc, char *argv[])
 {
 	unsigned int i;
@@ -388,6 +390,8 @@ int main(int argc, char *argv[])
 	if(PIN_Init(argc,argv)) {
 		return -1;
 	}
+
+	//IMG_AddInstrumentFunction(pin_image_handler, 0);
 
 	printf("%s, %d\n", __func__, __LINE__);
 	INS_AddInstrumentFunction(pin_instruction_handler, 0);

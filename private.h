@@ -4,8 +4,9 @@
 #include "hash_table.h"
 #include "simulator.h"
 
-#define LINES_PER_PAGE (1 << (PAGEOFF_BITS - N_BLOCKOFF_BITS))
 
+#define MAX_MAPPINGS 1000
+#define LINES_PER_PAGE (1 << (PAGEOFF_BITS - N_BLOCKOFF_BITS))
 #define PAGE_MASK ((1 << PAGEOFF_BITS) - 1)
 
 #define PAGE_GET_INDEX(__addr) ((__addr & PAGE_MASK) >> N_BLOCKOFF_BITS)
@@ -26,6 +27,9 @@ typedef struct {
   /* set to core # of the owner if the page is private and owned */
   int owner;
 
+  /* index into the memory map */
+  int map_index;
+
   // for each cache line on this page, the bitmask of 
   // cores that have accessed it
   // this is for tracking false sharing
@@ -37,6 +41,24 @@ typedef struct {
   /* hash table of pt_entry_t */
   ht_t *ht;
 } page_table_t;
+
+
+typedef struct {  
+  char *info;
+  uint64_t start_addr;
+  uint64_t end_addr;
+
+  // these last five fields are only for post-simulation processing
+  uint64_t num_shared_pages;
+  uint64_t num_private_pages;
+  uint64_t num_shared_blocks;
+  uint64_t num_private_blocks;
+  uint64_t num_multiprivate_pages;
+} map_t;
+
+typedef struct {
+  map_t maps[MAX_MAPPINGS];
+} mem_map_t;
 
 /* returns True if the page is now privately owned by the accessing core,
 returns False if the page is now shared */

@@ -3,9 +3,12 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <fcntl.h>
 #include "private.h"
 
 static page_table_t pt;
+static mem_map_t mm;
+static int max_index;
 
 static int page_cmp(void *val1, void *val2)
 {
@@ -24,6 +27,73 @@ static int page_hash(void *data)
   return (int)(*tag);
 }
 
+
+
+void print_mem_map() {
+  char fstr[1000];
+
+  FILE *fp = fopen("/proc/self/maps", "r");
+  assert(fp);
+
+  while(fgets(fstr, sizeof(fstr), fp) != NULL) {
+	printf("%s", fstr);
+  }
+
+  fclose(fp);
+}
+
+int alloc_new_map(uint64_t addr) {
+  char fstr[1000];
+  uint64_t start_addr, end_addr;
+  bool done = false;
+
+  assert(max_index < MAX_MAPPINGS);
+
+  FILE *fp = fopen("/proc/self/maps", "r");
+  assert(fp);
+
+  while(fgets(fstr, sizeof(fstr), fp) != NULL) {
+	sscanf(fstr, "%16lx-%16lx ", &start_addr, &end_addr);
+	if(addr >= start_addr && addr <= end_addr) {
+	  done = true;
+	  break;
+	}
+  }
+  assert(done);
+  fclose(fp);
+
+  mm.maps[max_index].start_addr = start_addr;
+  mm.maps[max_index].end_addr = end_addr;
+  mm.maps[max_index].num_shared_pages = 0;
+  mm.maps[max_index].num_private_pages = 0;
+  mm.maps[max_index].num_shared_blocks = 0;
+  mm.maps[max_index].num_private_blocks = 0;
+  mm.maps[max_index].num_multiprivate_pages = 0;
+  mm.maps[max_index].info = (char *)malloc(strlen(fstr));
+  strcpy(mm.maps[max_index].info, fstr);
+
+  max_index++;
+  return max_index-1;
+}
+
+// searches the memory map for a range that addr fits in
+// if none found, searches /proc/self/maps for a new mapping and adds it in
+int search_mem_map(uint64_t addr) {
+  for(int i = 0; i < max_index; i++) {
+	if(addr >= mm.maps[i].start_addr && addr <= mm.maps[i].end_addr) {
+	  return i;
+	} 
+  }
+  // no matching range found
+  return alloc_new_map(addr);
+}
+
+int map_cmp(const void* a, const void* b) {
+  map_t *m1 = (map_t*)a;
+  map_t *m2 = (map_t*)b;
+  return m1->num_shared_pages - m2->num_shared_pages;
+}
+
 bool access_page(int core, uint64_t addr)
 {
   uint64_t tag = GET_PAGE_TAG(addr);
@@ -38,6 +108,7 @@ bool access_page(int core, uint64_t addr)
 	val->owner = core;
 	val->tag = tag;
 	val->priv = true;
+	val->map_index = search_mem_map(addr);
 	for(int i=0; i < LINES_PER_PAGE; i++) {
 	  val->line_bm[i] = 0;
 	}
@@ -77,38 +148,116 @@ bool shared(int bitmask) {
 void print_false_sharing_report(void)
 {
   ht_iter_t iter;
-  int priv_pages=0, shared_pages=0;
+  int priv_pages=0, shared_pages=0, multiprivate_pages=0;
   int priv_blocks=0, shared_blocks=0;
   pt_entry_t *entry;
+  bool any_shared_blocks;
 
   for(ht_iter_init(&iter, pt.ht); ht_iter_data(&iter); ht_iter_next(&iter)) {
 	entry = (pt_entry_t *)ht_iter_data(&iter);
-	if(entry->priv) {
-	  priv_pages++;
-	} else {
-	  shared_pages++;
-	}
+
+	any_shared_blocks = false; 
 	for(int i=0; i < LINES_PER_PAGE; i++) {
 	  if(shared(entry->line_bm[i])) {
+		any_shared_blocks = true;
 		shared_blocks++;
+		mm.maps[entry->map_index].num_shared_blocks++;
 	  } else {
 		priv_blocks++;
+		mm.maps[entry->map_index].num_private_blocks++;
 	  }
 	}
+
+	if(entry->priv) {
+	  priv_pages++;
+	  mm.maps[entry->map_index].num_private_pages++;
+	} else if(any_shared_blocks) {
+	  shared_pages++;
+	  mm.maps[entry->map_index].num_shared_pages++;
+	} else {
+	  // if there are only private blocks from different cores, 
+	  // then this is DEFINITELY a false share page, because
+	  // we could just separate the data
+	  //   (there are other kinds of false sharing not covered
+	  //    by this check)
+	  multiprivate_pages++;
+	  mm.maps[entry->map_index].num_multiprivate_pages++;
+	}
+
   }
 
-  printf("Private Pages: %d\n", priv_pages);
-  printf("Shared Pages: %d\n", shared_pages);
-  printf("Page Privacy: %.2f%%\n", 
-		 (100.0*priv_pages)/(priv_pages+shared_pages));
-  printf("Private Blocks: %d\n", priv_blocks);
-  printf("Shared Blocks: %d\n", shared_blocks);
-  printf("Block Privacy: %.2f%%\n", 
+  // sort regions by # of shared pages
+  qsort((void*)mm.maps, (size_t)max_index, sizeof(map_t), map_cmp);
+
+  printf("********************\n");
+  printf("Data Privacy Report\n");
+  printf("********************\n");
+
+  for(int i = 0; i < max_index; i++) {
+	printf("%s", mm.maps[i].info);
+	printf("Private Pages: %d (%.2f%%)\n", mm.maps[i].num_private_pages,
+		   (100.0*mm.maps[i].num_private_pages)/
+		   (mm.maps[i].num_private_pages+
+			mm.maps[i].num_shared_pages+
+			mm.maps[i].num_multiprivate_pages));
+	printf("Shared Pages: %d (%.2f%%)\n", mm.maps[i].num_shared_pages,
+		   (100.0*mm.maps[i].num_shared_pages)/
+		   (mm.maps[i].num_private_pages+
+			mm.maps[i].num_shared_pages+
+			mm.maps[i].num_multiprivate_pages));
+	printf("Multiprivate Pages: %d (%.2f%%)\n", 
+		   mm.maps[i].num_multiprivate_pages,
+		   (100.0*mm.maps[i].num_multiprivate_pages)/
+		   (mm.maps[i].num_private_pages+
+			mm.maps[i].num_shared_pages+
+			mm.maps[i].num_multiprivate_pages));
+
+	printf("Private Blocks: %d (%.2f%%)\n", mm.maps[i].num_private_blocks,
+		   (100.0*mm.maps[i].num_private_blocks)/
+		   (mm.maps[i].num_private_blocks+
+			mm.maps[i].num_shared_blocks));
+	printf("Shared Blocks: %d (%.2f%%)\n", mm.maps[i].num_shared_blocks,
+		   (100.0*mm.maps[i].num_shared_blocks)/
+		   (mm.maps[i].num_private_blocks+
+			mm.maps[i].num_shared_blocks));
+
+	printf("Potential Page Gain: %.1f\n",
+		   (mm.maps[i].num_private_pages+
+			mm.maps[i].num_shared_pages+
+			mm.maps[i].num_multiprivate_pages)*
+		   ((1.0*mm.maps[i].num_private_blocks)/
+			(mm.maps[i].num_private_blocks+
+			 mm.maps[i].num_shared_blocks) -
+			(1.0*mm.maps[i].num_private_pages)/
+			(mm.maps[i].num_private_pages+
+			 mm.maps[i].num_shared_pages+
+			 mm.maps[i].num_multiprivate_pages)));
+
+  }
+
+  printf("********************\n");
+  printf("      Summary       \n");
+  printf("********************\n");
+
+  printf("Private Pages: %d (%.2f%%)\n", priv_pages,
+		 (100.0*priv_pages)/(priv_pages+shared_pages+multiprivate_pages));
+  printf("Shared Pages: %d (%.2f%%)\n", shared_pages,
+		 (100.0*shared_pages)/(priv_pages+shared_pages+multiprivate_pages));
+  printf("Multiprivate Pages: %d (%.2f%%)\n", multiprivate_pages,
+		 (100.0*multiprivate_pages)/
+		 (priv_pages+shared_pages+multiprivate_pages));
+  printf("Private Blocks: %d (%.2f%%)\n", priv_blocks,
 		 (100.0*priv_blocks)/(priv_blocks+shared_blocks));
+  printf("Shared Blocks: %d (%.2f%%)\n", shared_blocks,
+		 (100.0*shared_blocks)/(priv_blocks+shared_blocks));
+  printf("Potential Gap: %.2f%%\n",
+		 (100.0*priv_blocks)/(priv_blocks+shared_blocks) -
+		 (100.0*priv_pages)/(priv_pages+shared_pages+multiprivate_pages));
 }
 
 void page_table_init(void)
 {
   pt.ht = ht_create(101, page_hash, page_cmp, free);
+  max_index = 0;
 }
 #endif

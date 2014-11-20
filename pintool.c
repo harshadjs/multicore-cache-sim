@@ -30,6 +30,16 @@ void pin_write_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
 	PIN_ReleaseLock(&lock);
 }
 
+
+
+void pin_image_handler(IMG img, void *v) {
+  printf("New Image Loaded: %s\n", IMG_Name(img).c_str());
+  for(SEC sec = IMG_SecHead(img); SEC_Valid(sec); sec = SEC_Next(sec)) {
+	printf("Section Name: %s, %lx, %lx\n", SEC_Name(sec).c_str(),
+		   SEC_Address(sec), SEC_Address(sec) + SEC_Size(sec));
+  }
+}
+
 /* Pin instruction handler: Called on execution of every instruction */
 void pin_instruction_handler(INS ins, void *v) {
 	ADDRINT iaddr = INS_Address(ins);

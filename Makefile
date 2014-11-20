@@ -2,9 +2,9 @@
 ## Barebones Makefile for Pintool
 ##
 
-PIN_ROOT = /home/harshad/tools/pin
+#PIN_ROOT = /home/harshad/tools/pin
 CONFIG=./config.make
-#PIN_ROOT = /afs/andrew.cmu.edu/usr11/tloffred/Coursework/Arch/proj/pin-2.14
+PIN_ROOT = /afs/andrew.cmu.edu/usr11/tloffred/Coursework/Arch/proj/pin-2.14
 PIN_ARCH = intel64
 
 LINKER?=${CXX}
