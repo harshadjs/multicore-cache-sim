@@ -5,6 +5,13 @@
 #include "simulator.h"
 
 
+// define DISABLE_RDONLY_COHERENCE to disable cache 
+// coherence (aka directory tracking) for memory
+// that is read only. This feature uses /proc/pid/maps
+// to determine what memory is read only, and assumes 
+// the memory permissions do not change once mapped
+//#define DISABLE_RDONLY_COHERENCE
+
 #define MAX_MAPPINGS 1000
 #define LINES_PER_PAGE (1 << (PAGEOFF_BITS - N_BLOCKOFF_BITS))
 #define PAGE_MASK ((1 << PAGEOFF_BITS) - 1)
@@ -47,6 +54,7 @@ typedef struct {
   char *info;
   uint64_t start_addr;
   uint64_t end_addr;
+  bool writable;
 
   // these last five fields are only for post-simulation processing
   uint64_t num_shared_pages;
