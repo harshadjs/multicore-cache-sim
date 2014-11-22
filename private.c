@@ -45,6 +45,7 @@ void print_mem_map() {
 int alloc_new_map(uint64_t addr) {
   char fstr[1000];
   uint64_t start_addr, end_addr;
+  char readable, writable;
   bool done = false;
 
   assert(max_index < MAX_MAPPINGS);
@@ -53,7 +54,8 @@ int alloc_new_map(uint64_t addr) {
   assert(fp);
 
   while(fgets(fstr, sizeof(fstr), fp) != NULL) {
-	sscanf(fstr, "%16lx-%16lx ", &start_addr, &end_addr);
+	sscanf(fstr, "%16lx-%16lx %c%c", 
+		   &start_addr, &end_addr, &readable, &writable);
 	if(addr >= start_addr && addr <= end_addr) {
 	  done = true;
 	  break;
@@ -64,6 +66,15 @@ int alloc_new_map(uint64_t addr) {
 
   mm.maps[max_index].start_addr = start_addr;
   mm.maps[max_index].end_addr = end_addr;
+#ifdef DISABLE_RDONLY_COHERENCE
+  if(writable == 'w') {
+	mm.maps[max_index].writable = true;
+  } else {
+	mm.maps[max_index].writable = false;
+  }
+#else
+	mm.maps[max_index].writable = true;
+#endif
   mm.maps[max_index].num_shared_pages = 0;
   mm.maps[max_index].num_private_pages = 0;
   mm.maps[max_index].num_shared_blocks = 0;
@@ -124,18 +135,27 @@ bool access_page(int core, uint64_t addr)
 		return true;
 	  } else {
 		// pt entry owned by other code
-		// This is how pages become permanently shared,
-		// and enter into the directory protocol
-		val->priv = false;
-		cache_invalidate(val->owner, addr);
-		PAGE_SET_PROCESSOR_BM(val, core, addr);
-		return false;
+		if(mm.maps[val->map_index].writable) {
+		  // This is how pages become permanently shared,
+		  // and enter into the directory protocol
+		  val->priv = false;
+		  cache_invalidate(val->owner, addr);
+		  PAGE_SET_PROCESSOR_BM(val, core, addr);
+		  return false;
+		} else {
+		  PAGE_SET_PROCESSOR_BM(val, core, addr);
+		  return true;
+		}
 	  }
 	} else {
 	  // pt entry shared
 	  // nothing special to do
 	  PAGE_SET_PROCESSOR_BM(val, core, addr);
-	  return false;
+	  if(mm.maps[val->map_index].writable) {	  
+		return false;
+	  } else {
+		return true;
+	  }
 	}
   }
 }
