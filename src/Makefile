@@ -3,8 +3,6 @@
 ##
 
 SIM_ROOT=..
-PIN_ROOT = /home/harshad/tools/pin
-#PIN_ROOT = /afs/andrew.cmu.edu/usr11/tloffred/Coursework/Arch/proj/pin-2.14
 PIN_ARCH = intel64
 
 LINKER?=${CXX}
@@ -37,15 +35,7 @@ OUTOPT = -o
 LINK_OUT = -o
 TOOLS = $(TOOL_ROOTS:%=%$(PINTOOL_SUFFIX))
 
-ifeq ($(PINTOOL), 1)
-CFLAGS += -DPINTOOL
-endif
-
-ifeq ($(PRIVATE_TRACKING), 1)
-CFLAGS += -DPRIVATE_TRACKING
-endif
-
-CFLAGS+=${CXXFLAGS} -g -I${PIN_SRC}
+CFLAGS+=-g -I${PIN_SRC} ${CXXFLAGS}
 
 ## build rules
 

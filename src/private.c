@@ -147,112 +147,122 @@ bool shared(int bitmask) {
 
 void print_false_sharing_report(void)
 {
-  ht_iter_t iter;
-  int priv_pages=0, shared_pages=0, multiprivate_pages=0;
-  int priv_blocks=0, shared_blocks=0;
-  pt_entry_t *entry;
-  bool any_shared_blocks;
+	ht_iter_t iter;
+	int priv_pages=0, shared_pages=0, multiprivate_pages=0;
+	int priv_blocks=0, shared_blocks=0;
+	pt_entry_t *entry;
+	bool any_shared_blocks;
+	FILE *fp_page_tracking = fopen(PLOT_DIR"/page_track", "a");
+	FILE *fp_block_tracking = fopen(PLOT_DIR"/block_track", "a");
 
-  for(ht_iter_init(&iter, pt.ht); ht_iter_data(&iter); ht_iter_next(&iter)) {
-	entry = (pt_entry_t *)ht_iter_data(&iter);
+	for(ht_iter_init(&iter, pt.ht); ht_iter_data(&iter); ht_iter_next(&iter)) {
+		entry = (pt_entry_t *)ht_iter_data(&iter);
 
-	any_shared_blocks = false; 
-	for(int i=0; i < LINES_PER_PAGE; i++) {
-	  if(shared(entry->line_bm[i])) {
-		any_shared_blocks = true;
-		shared_blocks++;
-		mm.maps[entry->map_index].num_shared_blocks++;
-	  } else {
-		priv_blocks++;
-		mm.maps[entry->map_index].num_private_blocks++;
-	  }
+		any_shared_blocks = false; 
+		for(int i=0; i < LINES_PER_PAGE; i++) {
+			if(shared(entry->line_bm[i])) {
+				any_shared_blocks = true;
+				shared_blocks++;
+				mm.maps[entry->map_index].num_shared_blocks++;
+			} else {
+				priv_blocks++;
+				mm.maps[entry->map_index].num_private_blocks++;
+			}
+		}
+
+		if(entry->priv) {
+			priv_pages++;
+			mm.maps[entry->map_index].num_private_pages++;
+		} else if(any_shared_blocks) {
+			shared_pages++;
+			mm.maps[entry->map_index].num_shared_pages++;
+		} else {
+			// if there are only private blocks from different cores, 
+			// then this is DEFINITELY a false share page, because
+			// we could just separate the data
+			//   (there are other kinds of false sharing not covered
+			//    by this check)
+			multiprivate_pages++;
+			mm.maps[entry->map_index].num_multiprivate_pages++;
+		}
+
 	}
 
-	if(entry->priv) {
-	  priv_pages++;
-	  mm.maps[entry->map_index].num_private_pages++;
-	} else if(any_shared_blocks) {
-	  shared_pages++;
-	  mm.maps[entry->map_index].num_shared_pages++;
-	} else {
-	  // if there are only private blocks from different cores, 
-	  // then this is DEFINITELY a false share page, because
-	  // we could just separate the data
-	  //   (there are other kinds of false sharing not covered
-	  //    by this check)
-	  multiprivate_pages++;
-	  mm.maps[entry->map_index].num_multiprivate_pages++;
+	// sort regions by # of shared pages
+	qsort((void*)mm.maps, (size_t)max_index, sizeof(map_t), map_cmp);
+
+	printf("********************\n");
+	printf("Data Privacy Report\n");
+	printf("********************\n");
+
+	for(int i = 0; i < max_index; i++) {
+		printf("%s", mm.maps[i].info);
+		printf("Private Pages: %Lu (%.2f%%)\n", mm.maps[i].num_private_pages,
+			   (100.0*mm.maps[i].num_private_pages)/
+			   (mm.maps[i].num_private_pages+
+				mm.maps[i].num_shared_pages+
+				mm.maps[i].num_multiprivate_pages));
+		printf("Shared Pages: %Lu (%.2f%%)\n", mm.maps[i].num_shared_pages,
+			   (100.0*mm.maps[i].num_shared_pages)/
+			   (mm.maps[i].num_private_pages+
+				mm.maps[i].num_shared_pages+
+				mm.maps[i].num_multiprivate_pages));
+		printf("Multiprivate Pages: %Lu (%.2f%%)\n", 
+			   mm.maps[i].num_multiprivate_pages,
+			   (100.0*mm.maps[i].num_multiprivate_pages)/
+			   (mm.maps[i].num_private_pages+
+				mm.maps[i].num_shared_pages+
+				mm.maps[i].num_multiprivate_pages));
+
+		printf("Private Blocks: %Lu (%.2f%%)\n", mm.maps[i].num_private_blocks,
+			   (100.0*mm.maps[i].num_private_blocks)/
+			   (mm.maps[i].num_private_blocks+
+				mm.maps[i].num_shared_blocks));
+		printf("Shared Blocks: %Lu (%.2f%%)\n", mm.maps[i].num_shared_blocks,
+			   (100.0*mm.maps[i].num_shared_blocks)/
+			   (mm.maps[i].num_private_blocks+
+				mm.maps[i].num_shared_blocks));
+
+		printf("Potential Page Gain: %.1f\n",
+			   (mm.maps[i].num_private_pages+
+				mm.maps[i].num_shared_pages+
+				mm.maps[i].num_multiprivate_pages)*
+			   ((1.0*mm.maps[i].num_private_blocks)/
+				(mm.maps[i].num_private_blocks+
+				 mm.maps[i].num_shared_blocks) -
+				(1.0*mm.maps[i].num_private_pages)/
+				(mm.maps[i].num_private_pages+
+				 mm.maps[i].num_shared_pages+
+				 mm.maps[i].num_multiprivate_pages)));
+
 	}
 
-  }
+	printf("********************\n");
+	printf("      Summary       \n");
+	printf("********************\n");
 
-  // sort regions by # of shared pages
-  qsort((void*)mm.maps, (size_t)max_index, sizeof(map_t), map_cmp);
-
-  printf("********************\n");
-  printf("Data Privacy Report\n");
-  printf("********************\n");
-
-  for(int i = 0; i < max_index; i++) {
-	printf("%s", mm.maps[i].info);
-	printf("Private Pages: %d (%.2f%%)\n", mm.maps[i].num_private_pages,
-		   (100.0*mm.maps[i].num_private_pages)/
-		   (mm.maps[i].num_private_pages+
-			mm.maps[i].num_shared_pages+
-			mm.maps[i].num_multiprivate_pages));
-	printf("Shared Pages: %d (%.2f%%)\n", mm.maps[i].num_shared_pages,
-		   (100.0*mm.maps[i].num_shared_pages)/
-		   (mm.maps[i].num_private_pages+
-			mm.maps[i].num_shared_pages+
-			mm.maps[i].num_multiprivate_pages));
-	printf("Multiprivate Pages: %d (%.2f%%)\n", 
-		   mm.maps[i].num_multiprivate_pages,
-		   (100.0*mm.maps[i].num_multiprivate_pages)/
-		   (mm.maps[i].num_private_pages+
-			mm.maps[i].num_shared_pages+
-			mm.maps[i].num_multiprivate_pages));
-
-	printf("Private Blocks: %d (%.2f%%)\n", mm.maps[i].num_private_blocks,
-		   (100.0*mm.maps[i].num_private_blocks)/
-		   (mm.maps[i].num_private_blocks+
-			mm.maps[i].num_shared_blocks));
-	printf("Shared Blocks: %d (%.2f%%)\n", mm.maps[i].num_shared_blocks,
-		   (100.0*mm.maps[i].num_shared_blocks)/
-		   (mm.maps[i].num_private_blocks+
-			mm.maps[i].num_shared_blocks));
-
-	printf("Potential Page Gain: %.1f\n",
-		   (mm.maps[i].num_private_pages+
-			mm.maps[i].num_shared_pages+
-			mm.maps[i].num_multiprivate_pages)*
-		   ((1.0*mm.maps[i].num_private_blocks)/
-			(mm.maps[i].num_private_blocks+
-			 mm.maps[i].num_shared_blocks) -
-			(1.0*mm.maps[i].num_private_pages)/
-			(mm.maps[i].num_private_pages+
-			 mm.maps[i].num_shared_pages+
-			 mm.maps[i].num_multiprivate_pages)));
-
-  }
-
-  printf("********************\n");
-  printf("      Summary       \n");
-  printf("********************\n");
-
-  printf("Private Pages: %d (%.2f%%)\n", priv_pages,
-		 (100.0*priv_pages)/(priv_pages+shared_pages+multiprivate_pages));
-  printf("Shared Pages: %d (%.2f%%)\n", shared_pages,
-		 (100.0*shared_pages)/(priv_pages+shared_pages+multiprivate_pages));
-  printf("Multiprivate Pages: %d (%.2f%%)\n", multiprivate_pages,
-		 (100.0*multiprivate_pages)/
-		 (priv_pages+shared_pages+multiprivate_pages));
-  printf("Private Blocks: %d (%.2f%%)\n", priv_blocks,
-		 (100.0*priv_blocks)/(priv_blocks+shared_blocks));
-  printf("Shared Blocks: %d (%.2f%%)\n", shared_blocks,
-		 (100.0*shared_blocks)/(priv_blocks+shared_blocks));
-  printf("Potential Gap: %.2f%%\n",
-		 (100.0*priv_blocks)/(priv_blocks+shared_blocks) -
-		 (100.0*priv_pages)/(priv_pages+shared_pages+multiprivate_pages));
+	printf("Private Pages: %d (%.2f%%)\n", priv_pages,
+		   (100.0*priv_pages)/(priv_pages+shared_pages+multiprivate_pages));
+	printf("Shared Pages: %d (%.2f%%)\n", shared_pages,
+		   (100.0*shared_pages)/(priv_pages+shared_pages+multiprivate_pages));
+	printf("Multiprivate Pages: %d (%.2f%%)\n", multiprivate_pages,
+		   (100.0*multiprivate_pages)/
+		   (priv_pages+shared_pages+multiprivate_pages));
+	printf("Private Blocks: %d (%.2f%%)\n", priv_blocks,
+		   (100.0*priv_blocks)/(priv_blocks+shared_blocks));
+	printf("Shared Blocks: %d (%.2f%%)\n", shared_blocks,
+		   (100.0*shared_blocks)/(priv_blocks+shared_blocks));
+	printf("Potential Gap: %.2f%%\n",
+		   (100.0*priv_blocks)/(priv_blocks+shared_blocks) -
+		   (100.0*priv_pages)/(priv_pages+shared_pages+multiprivate_pages));
+	fprintf(fp_page_tracking, "ProgramName %d %d %d\n",
+			priv_pages,
+			shared_pages, multiprivate_pages);
+	fclose(fp_page_tracking);
+	fprintf(fp_block_tracking, "ProgramName %d %d\n",
+			priv_blocks,
+			shared_blocks);
+	fclose(fp_block_tracking);
 }
 
 void page_table_init(void)

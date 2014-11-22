@@ -377,31 +377,23 @@ int main(int argc, char *argv[])
 {
 	unsigned int i;
 
-	printf("%s, %d\n", __func__, __LINE__);
 	directory_init();
 #ifdef PRIVATE_TRACKING
 	page_table_init();
 #endif
 
 #ifdef PINTOOL
-	printf("%s, %d\n", __func__, __LINE__);
 	PIN_InitSymbols();
-	printf("%s, %d\n", __func__, __LINE__);
 	if(PIN_Init(argc,argv)) {
 		return -1;
 	}
 
 	//IMG_AddInstrumentFunction(pin_image_handler, 0);
 
-	printf("%s, %d\n", __func__, __LINE__);
 	INS_AddInstrumentFunction(pin_instruction_handler, 0);
-	printf("%s, %d\n", __func__, __LINE__);
 	PIN_AddFiniFunction(pin_finish, 0);
-	printf("%s, %d\n", __func__, __LINE__);
 	PIN_InitLock(&lock);
-	printf("%s, %d\n", __func__, __LINE__);
 	PIN_StartProgram();
-	printf("%s, %d\n", __func__, __LINE__);
 #else
 	for(i = 0; i < N_WORKLOAD; i++) {
 	  //printf("**** [%d] %s:	0x%lx ****\n",
@@ -423,7 +415,6 @@ int main(int argc, char *argv[])
 	PRINT_STAT(directory_excl_hits);
 	PRINT_STAT(directory_shared_hits);
 	PRINT_STAT(directory_deletions);
-
 #endif
 
 	return 0;
