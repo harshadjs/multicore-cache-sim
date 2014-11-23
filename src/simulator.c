@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdint.h>
+#include <string.h>
 #ifdef PINTOOL
 #include "pintool.h"
 #include "pin.H"
@@ -18,14 +19,17 @@ extern PIN_LOCK lock;
 int hits, misses, directory_transactions, directory_misses,
 	directory_hits, directory_invalidations, directory_excl_hits,
 	directory_shared_hits, directory_deletions;
-int misses_per_core[N_CORES];
 
+uint64_t misses_per_core[N_CORES];
+uint64_t inst_per_core[N_CORES];
 
 /* Global virtual clock */
 uint64_t ticks;
 
 /* Cache array */
 cache_t cores[N_CORES];
+
+char *program_name;
 
 #ifdef PINTOOL
 //#define printf(...)
@@ -350,9 +354,11 @@ void print_changed_stats(void)
 }
 
 #ifdef PINTOOL
+
 void pin_finish(int code, void *v)
 {
 	int i;
+	FILE *fp = fopen(PLOT_DIR"/cache_stats", "a");
 
 	PRINT_STAT(hits);
 	PRINT_STAT(misses);
@@ -366,18 +372,26 @@ void pin_finish(int code, void *v)
 	for(i = 0; i < N_CORES; i++) {
 		printf("Misses on core %d = %d\n", i, misses_per_core[i]);
 	}
+	fprintf(fp, "%s %lf %lf\n",
+			program_name,
+			PERCENTAGE(misses, hits + misses),
+			PERCENTAGE(directory_misses, directory_misses + directory_hits));
+	fclose(fp);
 #ifdef PRIVATE_TRACKING
 	print_false_sharing_report();
 #endif
 }
 #endif
 
-
 int main(int argc, char *argv[])
 {
 	unsigned int i;
 
 	directory_init();
+	program_name = strrchr(argv[12], '/') + 1;
+	if(!program_name)
+		program_name = argv[argc - 1];
+
 #ifdef PRIVATE_TRACKING
 	page_table_init();
 #endif

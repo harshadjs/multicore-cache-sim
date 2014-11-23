@@ -1,0 +1,59 @@
+set term pdf
+set output output_file
+
+################
+## Page stats ##
+################
+
+set title "Page tracking statistics"
+set style data histograms
+set style histogram rowstacked
+set boxwidth 0.2 relative
+
+set style fill solid 1.0 border -1
+set datafile separator " "
+
+set xtics rotate by 315
+
+plot page_track_input_file\
+	 using 2:xtic(1) t "private", \
+	 '' using 3:xtic(1) t "shared", \
+	 '' using 4:xtic(1) t "multiprivate", \
+	 '' using 5 t "" smooth unique
+
+#################
+## block stats ##
+#################
+
+set title "Block tracking statistics"
+set style data histograms
+set style histogram rowstacked
+set boxwidth 0.2 relative
+
+set style fill solid 1.0 border -1
+set datafile separator " "
+
+set xtics rotate by 315
+
+plot block_track_input_file \
+	 using 2:xtic(1) t "private", \
+	 '' using 3 t "shared", \
+	 '' using 4 t "" smooth unique
+
+#################
+## Cache stats ##
+#################
+
+set title "Cache statistics"
+set style data histograms
+set style histogram cluster gap 0.2
+
+set boxwidth 0.2 relative
+set style fill solid 1.0 border -1
+set datafile separator " "
+
+set xtics rotate by 315
+
+plot cache_stats_input_file using 2:xtic(1) t "core cache misses", \
+	 '' using 3 t "directory cache misses", \
+	 '' using 4 t "" smooth unique

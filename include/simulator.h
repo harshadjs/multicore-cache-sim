@@ -81,5 +81,7 @@ void cache_read(int, uint64_t);
 /* Write from a cache for a particular core */
 void cache_write(int, uint64_t);
 
+#define PERCENTAGE(__num, __total) (((__total) == 0) ?	\
+									(0) : ((((double)(__num)) * 100.0)/(__total)))
 
 #endif

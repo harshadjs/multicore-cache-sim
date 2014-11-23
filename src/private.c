@@ -6,6 +6,8 @@
 #include <fcntl.h>
 #include "private.h"
 
+extern char *program_name;
+
 static page_table_t pt;
 static mem_map_t mm;
 static int max_index;
@@ -26,8 +28,6 @@ static int page_hash(void *data)
   uint64_t *tag = (uint64_t*)data;
   return (int)(*tag);
 }
-
-
 
 void print_mem_map() {
   char fstr[1000];
@@ -54,7 +54,7 @@ int alloc_new_map(uint64_t addr) {
   assert(fp);
 
   while(fgets(fstr, sizeof(fstr), fp) != NULL) {
-	sscanf(fstr, "%16lx-%16lx %c%c", 
+	sscanf(fstr, "%16lx-%16lx %c%c",
 		   &start_addr, &end_addr, &readable, &writable);
 	if(addr >= start_addr && addr <= end_addr) {
 	  done = true;
@@ -169,7 +169,7 @@ void print_false_sharing_report(void)
 {
 	ht_iter_t iter;
 	int priv_pages=0, shared_pages=0, multiprivate_pages=0;
-	int priv_blocks=0, shared_blocks=0;
+	int priv_blocks=0, shared_blocks=0, total_pages=0;;
 	pt_entry_t *entry;
 	bool any_shared_blocks;
 
@@ -276,13 +276,17 @@ void print_false_sharing_report(void)
 	printf("Potential Gap: %.2f%%\n",
 		   (100.0*priv_blocks)/(priv_blocks+shared_blocks) -
 		   (100.0*priv_pages)/(priv_pages+shared_pages+multiprivate_pages));
-	fprintf(fp_page_tracking, "ProgramName %d %d %d\n",
-			priv_pages,
-			shared_pages, multiprivate_pages);
+	total_pages = priv_pages + shared_pages + multiprivate_pages;
+	fprintf(fp_page_tracking, "%s %lf %lf %lf\n",
+			program_name,
+			PERCENTAGE(priv_pages, total_pages),
+			PERCENTAGE(shared_pages, total_pages),
+			PERCENTAGE(multiprivate_pages, total_pages));
 	fclose(fp_page_tracking);
-	fprintf(fp_block_tracking, "ProgramName %d %d\n",
-			priv_blocks,
-			shared_blocks);
+	fprintf(fp_block_tracking, "%s %lf %lf\n",
+			program_name,
+			PERCENTAGE(priv_blocks, priv_blocks + shared_blocks),
+			PERCENTAGE(shared_blocks, priv_blocks + shared_blocks));
 	fclose(fp_block_tracking);
 }
 
