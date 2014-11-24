@@ -391,6 +391,7 @@ int main(int argc, char *argv[])
 	directory_init();
 	if(argc > 12) {
 	  program_name = strrchr(argv[12], '/');
+	  printf("program: %s\n", program_name);
 	  if(!program_name) {
 		program_name = argv[argc - 1];
 	  } else {
