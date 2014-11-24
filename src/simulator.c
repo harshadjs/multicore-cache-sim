@@ -359,6 +359,7 @@ void pin_finish(int code, void *v)
 {
 	int i;
 	FILE *fp = fopen(PLOT_DIR"/cache_stats", "a");
+	assert(fp);
 
 	PRINT_STAT(hits);
 	PRINT_STAT(misses);
@@ -388,9 +389,16 @@ int main(int argc, char *argv[])
 	unsigned int i;
 
 	directory_init();
-	program_name = strrchr(argv[12], '/') + 1;
-	if(!program_name)
+	if(argc > 12) {
+	  program_name = strrchr(argv[12], '/');
+	  if(!program_name) {
 		program_name = argv[argc - 1];
+	  } else {
+		program_name = program_name + 1;
+	  }
+	} else {
+	  program_name = argv[argc-1];
+	}
 
 #ifdef PRIVATE_TRACKING
 	page_table_init();

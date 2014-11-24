@@ -47,10 +47,12 @@ void pin_instruction_handler(INS ins, void *v) {
 	int core = PIN_ThreadId() % N_CORES;
 
 	inst_per_core[core]++;
-#ifdef notyet
-	INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) ICacheCheckAll,
-							 IARG_ADDRINT, iaddr, IARG_UINT32,
-							 (UINT32)(INS_Size(ins)), IARG_END);
+#ifdef TRACK_TLB
+	INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) pin_read_handler,
+							 IARG_ADDRINT, iaddr, 
+							 IARG_ADDRINT, iaddr,
+							 IARG_UINT32, (UINT32)(INS_Size(ins)), 
+							 IARG_BOOL, false, IARG_END);
 #endif
 
 	if(INS_IsMemoryRead(ins)) {

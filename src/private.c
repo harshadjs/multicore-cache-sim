@@ -277,12 +277,14 @@ void print_false_sharing_report(void)
 		   (100.0*priv_blocks)/(priv_blocks+shared_blocks) -
 		   (100.0*priv_pages)/(priv_pages+shared_pages+multiprivate_pages));
 	total_pages = priv_pages + shared_pages + multiprivate_pages;
+
 	fprintf(fp_page_tracking, "%s %lf %lf %lf\n",
 			program_name,
 			PERCENTAGE(priv_pages, total_pages),
 			PERCENTAGE(shared_pages, total_pages),
 			PERCENTAGE(multiprivate_pages, total_pages));
 	fclose(fp_page_tracking);
+
 	fprintf(fp_block_tracking, "%s %lf %lf\n",
 			program_name,
 			PERCENTAGE(priv_blocks, priv_blocks + shared_blocks),
