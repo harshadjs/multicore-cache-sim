@@ -389,6 +389,7 @@ int main(int argc, char *argv[])
 
 	directory_init();
 	program_name = strrchr(argv[12], '/') + 1;
+	printf("program: %s\n", program_name);
 	if(!program_name)
 		program_name = argv[argc - 1];
 
