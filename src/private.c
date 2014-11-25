@@ -61,9 +61,16 @@ int alloc_new_map(uint64_t addr) {
 	  break;
 	}
   }
-  assert(done);
+  if(!done) {
+	// reference to unmapped region?
+	start_addr = addr - (addr & (0x1000-1));
+	end_addr = start_addr + 0x1000;
+	readable = true;
+	writable = true;
+	strcpy(fstr, "[unmapped?]");
+  }
   fclose(fp);
-
+  
   mm.maps[max_index].start_addr = start_addr;
   mm.maps[max_index].end_addr = end_addr;
 #ifdef DISABLE_RDONLY_COHERENCE
@@ -169,7 +176,8 @@ void print_false_sharing_report(void)
 {
 	ht_iter_t iter;
 	int priv_pages=0, shared_pages=0, multiprivate_pages=0;
-	int priv_blocks=0, shared_blocks=0, total_pages=0;;
+	int priv_blocks=0, shared_blocks=0, total_pages=0;
+	int det_priv_blocks=0, det_shared_blocks=0;
 	pt_entry_t *entry;
 	bool any_shared_blocks;
 
@@ -181,14 +189,30 @@ void print_false_sharing_report(void)
 
 		any_shared_blocks = false; 
 		for(int i=0; i < LINES_PER_PAGE; i++) {
-			if(shared(entry->line_bm[i])) {
-				any_shared_blocks = true;
-				shared_blocks++;
-				mm.maps[entry->map_index].num_shared_blocks++;
-			} else {
-				priv_blocks++;
-				mm.maps[entry->map_index].num_private_blocks++;
-			}
+		  if(!entry->line_bm[i]) {
+			// if this line was unused, ignore it
+			continue;
+		  } 
+		  if(shared(entry->line_bm[i])) {
+			any_shared_blocks = true;
+			shared_blocks++;
+			mm.maps[entry->map_index].num_shared_blocks++;
+		  } else {
+			priv_blocks++;
+			mm.maps[entry->map_index].num_private_blocks++;
+		  }
+		}
+
+		for(int i=0; i < LINES_PER_PAGE; i++) {
+		  if(!entry->line_bm[i]) {
+			// if this line was unused, ignore it
+			continue;
+		  } 
+		  if(any_shared_blocks) {
+			det_shared_blocks++;
+		  } else {
+			det_priv_blocks++;
+		  }
 		}
 
 		if(entry->priv) {
@@ -277,6 +301,9 @@ void print_false_sharing_report(void)
 		   (100.0*priv_blocks)/(priv_blocks+shared_blocks) -
 		   (100.0*priv_pages)/(priv_pages+shared_pages+multiprivate_pages));
 	total_pages = priv_pages + shared_pages + multiprivate_pages;
+	printf("Detected Private Blocks (Ideal): %.2f%% (%.2f%%)\n",
+		   (100.0*det_priv_blocks)/(det_priv_blocks+det_shared_blocks),
+		   (100.0*priv_blocks)/(priv_blocks+shared_blocks));
 
 	fprintf(fp_page_tracking, "%s %lf %lf %lf\n",
 			program_name,
