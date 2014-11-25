@@ -3,7 +3,7 @@
 ##
 
 ## PINTOOL: Keep this on
-PINTOOL=1
+## PINTOOL=1
 
 ## If turned on, tracks private blocks. And so, disables coherence mechanism
 ## for all private blocks
@@ -19,3 +19,12 @@ DIR_SET_BITS=16
 
 ## Directory nways: Associativity of directory cache
 DIR_NWAYS=4
+
+###################
+## OPTIMIZATIONS ##
+###################
+## Turn ON to enable all optimizations
+OPTIMIZ=1
+
+## Finer control
+OPTIMIZ_HEAP=1

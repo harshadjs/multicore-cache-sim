@@ -1,7 +1,7 @@
-#ifdef PINTOOL
 #include <stdio.h>
 #include "pintool.h"
 #include "simulator.h"
+#include "optimiz.h"
 
 PIN_LOCK lock;
 extern uint64_t inst_per_core[N_CORES];
@@ -31,14 +31,27 @@ void pin_write_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
 	PIN_ReleaseLock(&lock);
 }
 
+void pin_image_handler(IMG img, void *v)
+{
+#ifdef OPTIMIZ
+#ifdef OPTIMIZ_HEAP
+	RTN rtn_malloc, rtn_free;
 
+	rtn_malloc = RTN_FindByName(img, "malloc");
+	if(rtn_malloc.is_valid()) {
+		RTN_Open(rtn_malloc);
+		RTN_Replace(rtn_malloc, (AFUNPTR)pin_malloc);
+		RTN_Close(rtn_malloc);
+	}
 
-void pin_image_handler(IMG img, void *v) {
-  printf("New Image Loaded: %s\n", IMG_Name(img).c_str());
-  for(SEC sec = IMG_SecHead(img); SEC_Valid(sec); sec = SEC_Next(sec)) {
-	printf("Section Name: %s, %lx, %lx\n", SEC_Name(sec).c_str(),
-		   SEC_Address(sec), SEC_Address(sec) + SEC_Size(sec));
-  }
+	rtn_free = RTN_FindByName(img, "free");
+	if(rtn_free.is_valid()) {
+		RTN_Open(rtn_free);
+		RTN_Replace(rtn_free, (AFUNPTR)pin_free);
+		RTN_Close(rtn_free);
+	}
+#endif
+#endif
 }
 
 /* Pin instruction handler: Called on execution of every instruction */
@@ -72,5 +85,3 @@ void pin_instruction_handler(INS ins, void *v) {
 								 IARG_BOOL, true, IARG_END);
 	}
 }
-
-#endif

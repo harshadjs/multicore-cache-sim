@@ -40,15 +40,17 @@ CFLAGS+=-g -I${PIN_SRC} ${CXXFLAGS}
 ## build rules
 
 %.o : %.c
+## TODO: too many rules, optimize here
 	$(CXX) -c $(CFLAGS) -odlist.o dlist.c
 	$(CXX) -c $(CFLAGS) -ohash_table.o hash_table.c
 	$(CXX) -c $(CFLAGS) -opintool.o pintool.c
 	$(CXX) -c $(CFLAGS) -osimulator.o simulator.c
 	$(CXX) -c $(CFLAGS) -odirectory.o directory.c
 	$(CXX) -c $(CFLAGS) -oprivate.o private.c
+	$(CXX) -c $(CFLAGS) -ooptimiz_heap.o optimiz_heap.c
 
 all: $(TOOLS)
 $(TOOLS): %$(PINTOOL_SUFFIX) : %.o
-	${LINKER} $(PIN_LDFLAGS) $(LINK_DEBUG) -osimulator.so directory.o dlist.o hash_table.o pintool.o private.o simulator.o ${PIN_LPATHS} $(PIN_LIBS) $(DBG)
+	${LINKER} $(PIN_LDFLAGS) $(LINK_DEBUG) -osimulator.so directory.o dlist.o hash_table.o pintool.o private.o simulator.o optimiz_heap.o ${PIN_LPATHS} $(PIN_LIBS) $(DBG)
 clean:
 	rm -f *.o

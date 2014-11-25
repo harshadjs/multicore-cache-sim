@@ -2,18 +2,14 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <string.h>
-#ifdef PINTOOL
 #include "pintool.h"
 #include "pin.H"
 #include "pin_profile.H"
-#endif
 #include "simulator.h"
 #include "directory.h"
 #include "private.h"
 
-#ifdef PINTOOL
 extern PIN_LOCK lock;
-#endif
 
 /* Stats */
 int hits, misses, directory_transactions, directory_misses,
@@ -30,10 +26,6 @@ uint64_t ticks;
 cache_t cores[N_CORES];
 
 char *program_name;
-
-#ifdef PINTOOL
-//#define printf(...)
-#endif
 
 void dump_core_cache(int core)
 {
@@ -353,8 +345,6 @@ void print_changed_stats(void)
 	old_hits = hits;
 }
 
-#ifdef PINTOOL
-
 void pin_finish(int code, void *v)
 {
 	int i;
@@ -370,7 +360,7 @@ void pin_finish(int code, void *v)
 	PRINT_STAT(directory_shared_hits);
 	PRINT_STAT(directory_deletions);
 	for(i = 0; i < N_CORES; i++) {
-		printf("Misses on core %d = %d\n", i, misses_per_core[i]);
+		printf("Misses on core %d = %Lu\n", i, misses_per_core[i]);
 	}
 	fprintf(fp, "%s %lf %lf\n",
 			program_name,
@@ -381,7 +371,6 @@ void pin_finish(int code, void *v)
 	print_false_sharing_report();
 #endif
 }
-#endif
 
 int main(int argc, char *argv[])
 {
@@ -397,19 +386,19 @@ int main(int argc, char *argv[])
 	page_table_init();
 #endif
 
-#ifdef PINTOOL
 	PIN_InitSymbols();
 	if(PIN_Init(argc,argv)) {
 		return -1;
 	}
 
-	//IMG_AddInstrumentFunction(pin_image_handler, 0);
+	IMG_AddInstrumentFunction(pin_image_handler, 0);
 
 	INS_AddInstrumentFunction(pin_instruction_handler, 0);
 	PIN_AddFiniFunction(pin_finish, 0);
 	PIN_InitLock(&lock);
 	PIN_StartProgram();
-#else
+#if 0
+	/* Not used anymore */
 	for(i = 0; i < N_WORKLOAD; i++) {
 	  //printf("**** [%d] %s:	0x%lx ****\n",
 	  //	   workload[i].core, workload[i].type == MEM_READ ?
