@@ -4,6 +4,10 @@
 #include "hash_table.h"
 #include "dlist.h"
 
+// define this if we want to track the code cache 
+// as well as the data cache
+//#define TRACK_TLB
+
 // Magny Cours from Cuesta has
 // 128k size cache per core ->
 // N_SETS*N_LINES = 128*1024
