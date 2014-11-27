@@ -8,12 +8,17 @@
 // as well as the data cache
 //#define TRACK_TLB
 
+// define this if we want to consider the first thread
+// to be a setup thread, and ignore its cache traffic
+#define IGNORE_STARTING_THREAD
+
 // Magny Cours from Cuesta has
-// 128k size cache per core ->
-// N_SETS*N_LINES = 128*1024
-// N_SET_BITS = 16
+// 32k processor cache entries ->
+// N_SETS*N_LINES = 32k
+// N_SET_BITS = log(16k) = 14
 // blocksize = 64 bytes = 2^6
-#define N_SET_BITS 16
+// num processors = 8 (4x2)
+#define N_SET_BITS 14
 #define N_BLOCKOFF_BITS 6
 #define N_TAG_BITS (32-N_SET_BITS-N_BLOCKOFF_BITS)
 // page size: 4k
@@ -27,7 +32,7 @@
 
 #define GET_PAGE_TAG(__addr) (__addr >> PAGEOFF_BITS)
 
-#define N_CORES 5
+#define N_CORES 9
 #define N_SETS (1<<(N_SET_BITS))
 #define N_LINES 2
 
@@ -35,6 +40,8 @@ enum {
 	ST_INVALID,
 	ST_SHARED,
 	ST_EXCLUSIVE,
+	ST_OWNED,
+	ST_MODIFIED
 };
 
 typedef struct {
@@ -46,7 +53,11 @@ typedef struct {
 #define IS_VALID(__line) (((__line)->state) != ST_INVALID)
 #define IS_SHARED(__line) (((__line)->state) == ST_SHARED)
 #define IS_EXCL(__line) (((__line)->state) == ST_EXCLUSIVE)
+#define IS_OWN(__line) (((__line)->state) == ST_OWNED)
+#define IS_MOD(__line) (((__line)->state) == ST_MODIFIED)
 
+#define SET_MOD(__line) (((__line)->state) = ST_MODIFIED)
+#define SET_OWN(__line) (((__line)->state) = ST_OWNED)
 #define SET_EXCLUSIVE(__line) (((__line)->state) = ST_EXCLUSIVE)
 #define SET_SHARED(__line) (((__line)->state) = ST_SHARED)
 #define SET_INVALID(__line) (((__line)->state) = ST_INVALID)
