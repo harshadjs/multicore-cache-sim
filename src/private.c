@@ -73,12 +73,16 @@ int alloc_new_map(uint64_t addr) {
   
   mm.maps[max_index].start_addr = start_addr;
   mm.maps[max_index].end_addr = end_addr;
-#ifdef DISABLE_RDONLY_COHERENCE
+#ifdef OPTIMIZ
+#ifdef OPTIMIZ_RDONLY_COHERENCE
   if(writable == 'w') {
 	mm.maps[max_index].writable = true;
   } else {
 	mm.maps[max_index].writable = false;
   }
+#else
+	mm.maps[max_index].writable = true;
+#endif
 #else
 	mm.maps[max_index].writable = true;
 #endif

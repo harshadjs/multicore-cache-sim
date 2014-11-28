@@ -6,7 +6,7 @@
 // 256k directory =
 // 4*2^16
 // coverage ratio of 2
-// #define DIR_SET_BITS 16
+// #define DIR_SET_BITS 14
 // #define DIR_NWAYS 4
 #define DIR_NSETS (1 << (DIR_SET_BITS))
 
@@ -64,6 +64,7 @@ enum {
 
 int dir_get_shared(int core, uint64_t tag);
 void dir_get_excl(int core, uint64_t tag);
+bool dir_excl_access(int core, uint64_t tag);
 void directory_delete_node(int core, uint64_t tag);
 
 #endif

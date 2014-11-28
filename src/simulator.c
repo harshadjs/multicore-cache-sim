@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "malloc.h"
+#include <sched.h>
 #include "pintool.h"
 #include "pin.H"
 #include "pin_profile.H"
@@ -126,8 +127,11 @@ void cache_downgrade(int core, uint64_t address)
 	for(i = 0; i < N_LINES; i++) {
 		line = &cores[core].sets[set].lines[i];
 
-		if((tag == line->tag) && (IS_VALID(line))) {
-			SET_SHARED(line);
+		if((tag == line->tag) && (IS_VALID(line)) &&
+		   (IS_MOD(line) || IS_EXCL(line))) {
+		  // modified lines write back and become owned
+		  // exclusive lines just become owned
+			SET_OWN(line);
 			return;
 		}
 	}
@@ -137,14 +141,17 @@ void cache_downgrade(int core, uint64_t address)
 cache_line_t *cache_load_shared(int core, uint64_t address)
 {
 	int oldest, set, access_level;
-#ifdef PRIVATE_TRACKING
 	bool priv_page;
 
+#ifdef PRIVATE_TRACKING
 	// priv_page is True if we have private access to this page
 	// i.e. no directory lookup needed
 	// priv_page is False if the page is shared
 	// i.e. normal operation: use the directory
 	priv_page = access_page(core, address);
+#else
+	priv_page = false;
+#endif
 
 	if(!priv_page) {
 		/* Directory can give SHARED/EXCL access */
@@ -152,9 +159,6 @@ cache_line_t *cache_load_shared(int core, uint64_t address)
 	} else {
 		access_level = DIR_ACCESS_EXCL;
 	}
-#else
-	access_level = dir_get_shared(core, address);
-#endif
 
 	set = cache_get_set(address);
 	oldest = find_lru_node(core, set);
@@ -176,23 +180,23 @@ cache_line_t *cache_load_shared(int core, uint64_t address)
 cache_line_t *cache_load_excl(int core, uint64_t address)
 {
 	int oldest, set;
+	bool priv_page, excl;
 #ifdef PRIVATE_TRACKING
-	bool priv_page;
-
 	// priv_page is True if we have private access to this page
 	// i.e. no directory lookup needed
 	// priv_page is False if the page is shared
 	// i.e. normal operation: use the directory
 	priv_page = access_page(core, address);
+#else
+	priv_page = false;
+#endif
 
 	if(!priv_page) {
 		/* Directory Must give us exclusive access */
 	  dir_get_excl(core, address);
+	  excl = dir_excl_access(core, address);
 	} 
 
-#else
-	dir_get_excl(core, address);
-#endif
 	set = cache_get_set(address);
 	oldest = find_lru_node_or_exact_match(core, set, address);
 	if(IS_VALID(&cores[core].sets[set].lines[oldest]) && 
@@ -200,7 +204,16 @@ cache_line_t *cache_load_excl(int core, uint64_t address)
 	  directory_delete_node(core, address);
 	}
 	cores[core].sets[set].lines[oldest].tag = MASK_TAG & address;
-	SET_EXCLUSIVE(&(cores[core].sets[set].lines[oldest]));
+
+	if(priv_page || excl) {
+	  // if there are no other cores sharing access currently
+	  // get modified status
+	  SET_MOD(&(cores[core].sets[set].lines[oldest]));
+	} else {
+	  // otherwise we get owned status, and dirty data is shared
+	  // with the other sharers
+	  SET_OWN(&(cores[core].sets[set].lines[oldest]));
+	}
 	
 	return &cores[core].sets[set].lines[oldest];
 }
@@ -221,7 +234,8 @@ cache_line_t *cache_search_shared(int core, uint64_t address)
 		if((IS_VALID(line)) &&
 		   ((line->tag) & MASK_TAG) == cache_get_tag(address)) {
 
-			if(IS_SHARED(line) || IS_EXCL(line)) {
+		  if(IS_SHARED(line) || IS_EXCL(line) || 
+			 IS_OWN(line) || IS_MOD(line)) {
 				hits++;
 				return line;
 			} else {
@@ -246,7 +260,7 @@ cache_line_t *cache_search_excl(int core, uint64_t address)
 		line = &cores[core].sets[cache_get_set(address)].lines[i];
 		if((IS_VALID(line)) &&
 		   (((line->tag) & MASK_TAG) == cache_get_tag(address))) {
-			if(IS_EXCL(line)) {
+		  if(IS_EXCL(line) || IS_OWN(line) || IS_MOD(line)) {
 				hits++;
 				return line;
 			} else {
@@ -264,6 +278,12 @@ void cache_read(int core, uint64_t address)
 {
 	cache_line_t *line;
 
+#ifdef IGNORE_STARTING_THREAD
+	if(core == 0) {
+	  return;
+	}
+#endif
+
 	// for now, just tick on every read/write, lamport clock style
 	ticks++;
 	//printf("[%d]\tRD: ", core);
@@ -280,6 +300,12 @@ void cache_read(int core, uint64_t address)
 void cache_write(int core, uint64_t address)
 {
 	cache_line_t *line;
+
+#ifdef IGNORE_STARTING_THREAD
+	if(core == 0) {
+	  return;
+	}
+#endif
 
 	// for now, just tick on every read/write, lamport clock style
 	ticks++;
@@ -348,7 +374,7 @@ void print_changed_stats(void)
 
 void pin_finish(int code, void *v)
 {
-	int i;
+  int i, j;
 	FILE *fp = fopen(PLOT_DIR"/cache_stats", "a");
 	assert(fp);
 

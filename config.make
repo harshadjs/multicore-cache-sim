@@ -15,7 +15,7 @@ PLOT_DIR=/tmp/plot
 ## Do not remove these parameters, otherwise the code will
 ## will not compile
 ## Directory set bits: Implies size of directory
-DIR_SET_BITS=16
+DIR_SET_BITS=14
 
 ## Directory nways: Associativity of directory cache
 DIR_NWAYS=4
@@ -27,4 +27,5 @@ DIR_NWAYS=4
 OPTIMIZ=1
 
 ## Finer control
-OPTIMIZ_HEAP=1
+OPTIMIZ_HEAP=0
+OPTIMIZ_RDONLY_COHERENCE=0

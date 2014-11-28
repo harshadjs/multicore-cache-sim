@@ -46,14 +46,14 @@ void downgrade_all(dir_entry_t *entry, uint64_t address)
 // OR if there is an entry with no cache presence, evict that instead
 // the eviction policy is: remove the line being shared by the fewest
 // cores (ties broken arbitrarily)
-dir_entry_t *dir_evict(int core, uint64_t address)
+dir_entry_t *dir_evict(directory_t *direct, int core, uint64_t address)
 {
 	dir_entry_t *val;
 	dir_entry_t *evicted = 0;
 	int i;
 
 	for(i = 0; i < DIR_NWAYS; i++) {
-		val = &dir->entries[DIR_GET_SET(address)][i];
+		val = &direct->entries[DIR_GET_SET(address)][i];
 
 		if(evicted == 0) {
 			evicted = val;
@@ -78,20 +78,20 @@ dir_entry_t *dir_evict(int core, uint64_t address)
 }
 
 // search for a specific tag, or evict to make room for it if necessary
-static dir_entry_t *dir_search(directory_t *dir, int core, uint64_t address)
+static dir_entry_t *dir_search(directory_t *direct, int core, uint64_t address)
 {
 	int i;
 	dir_entry_t *p = NULL;
 	uint64_t dirtag = DIR_GET_TAG(address);
 
 	for(i = 0; i < DIR_NWAYS; i++) {
-		p = &dir->entries[DIR_GET_SET(address)][i];
+		p = &direct->entries[DIR_GET_SET(address)][i];
 
 		if(p->valid && p->dirtag == dirtag)
 			return p;
 	}
 
-	return dir_evict(core, address);
+	return dir_evict(direct, core, address);
 }
 
 /**
@@ -179,6 +179,21 @@ void directory_delete_node(int core, uint64_t address)
 	if(val->ref_count == 0) {
 	  val->valid = false;
 	}
+}
+
+
+// determine if this is the only core with any access to address
+bool dir_excl_access(int core, uint64_t address) {
+	dir_entry_t *val;
+	uint64_t index = DIR_GET_INDEX(address);
+	uint64_t dirtag = DIR_GET_TAG(address);
+
+	directory_transactions++;
+
+	val = dir_search(&dir[index], core, address);
+
+	assert(val->valid && val->dirtag == dirtag);
+	return ((val->ref_count == 1) && (val->owner == core));
 }
 
 /**
