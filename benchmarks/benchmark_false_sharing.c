@@ -12,7 +12,7 @@
 /* Page size */
 #define PAGE_SIZ KB(4)
 #define N_PAGES_PER_THREAD 16
-#define N_THREADS 16
+#define N_THREADS 4
 
 struct my_page {
 	uint8_t data[PAGE_SIZ];

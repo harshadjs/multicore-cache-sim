@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <string.h>
+#include "malloc.h"
 #include "pintool.h"
 #include "pin.H"
 #include "pin_profile.H"
@@ -361,7 +362,7 @@ void pin_finish(int code, void *v)
 	PRINT_STAT(directory_shared_hits);
 	PRINT_STAT(directory_deletions);
 	for(i = 0; i < N_CORES; i++) {
-		printf("Misses on core %d = %Lu\n", i, misses_per_core[i]);
+		printf("Misses on core %d = %lu\n", i, misses_per_core[i]);
 	}
 	fprintf(fp, "%s %lf %lf\n",
 			program_name,
@@ -392,6 +393,12 @@ int main(int argc, char *argv[])
 
 #ifdef PRIVATE_TRACKING
 	page_table_init();
+#endif
+
+#ifdef OPTIMIZ
+#ifdef OPTIMIZ_HEAP
+	malloc_init();
+#endif
 #endif
 
 	PIN_InitSymbols();

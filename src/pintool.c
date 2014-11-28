@@ -1,47 +1,66 @@
 #include <stdio.h>
+#include <iostream>
 #include "pintool.h"
 #include "simulator.h"
-#include "optimiz.h"
+#include "malloc.h"
 
 PIN_LOCK lock;
 extern uint64_t inst_per_core[N_CORES];
+IMG g_img;
 
 void dump_core_cache(int);
 void pin_read_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
 {
 	int core = PIN_ThreadId() % N_CORES;
+	int i;
 
 	PIN_GetLock(&lock, PIN_ThreadId());
-	//printf("{ MEM_READ, %d, 0x%lx },\n", core, addr);
-	cache_read(core, addr);
+	for(i = 0; i < size; i++)
+		cache_read(core, ALTER_ADDRESS(addr + i));
 	PIN_ReleaseLock(&lock);
 }
 
 void pin_write_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
 {
 	int core = PIN_ThreadId() % N_CORES;
+	int i;
 
 	/*
 	 * Acquire a lock, so that no other thread interferes us.
 	 * Essentially, we are serializing the execution.
 	 */
 	PIN_GetLock(&lock, PIN_ThreadId());
-	//printf("{ MEM_WRITE, %d, 0x%lx },\n", core, addr);
-	cache_write(core, addr);
+	for(i = 0; i < size; i++)
+		cache_write(core, ALTER_ADDRESS(addr + i));
 	PIN_ReleaseLock(&lock);
 }
 
 void pin_image_handler(IMG img, void *v)
 {
+	RTN rtn_malloc, rtn_calloc, rtn_free, rtn_realloc;
+
 #ifdef OPTIMIZ
 #ifdef OPTIMIZ_HEAP
-	RTN rtn_malloc, rtn_free;
 
 	rtn_malloc = RTN_FindByName(img, "malloc");
 	if(rtn_malloc.is_valid()) {
 		RTN_Open(rtn_malloc);
 		RTN_Replace(rtn_malloc, (AFUNPTR)pin_malloc);
 		RTN_Close(rtn_malloc);
+	}
+
+	rtn_calloc = RTN_FindByName(img, "calloc");
+	if(rtn_calloc.is_valid()) {
+		RTN_Open(rtn_calloc);
+		RTN_Replace(rtn_calloc, (AFUNPTR)pin_calloc);
+		RTN_Close(rtn_calloc);
+	}
+
+	rtn_realloc = RTN_FindByName(img, "realloc");
+	if(rtn_realloc.is_valid()) {
+		RTN_Open(rtn_realloc);
+		RTN_Replace(rtn_realloc, (AFUNPTR)pin_realloc);
+		RTN_Close(rtn_realloc);
 	}
 
 	rtn_free = RTN_FindByName(img, "free");

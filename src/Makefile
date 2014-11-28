@@ -37,20 +37,23 @@ TOOLS = $(TOOL_ROOTS:%=%$(PINTOOL_SUFFIX))
 
 CFLAGS+=-g -I${PIN_SRC} ${CXXFLAGS}
 
+OBJS = dlist.o
+OBJS += hash_table.o
+OBJS += pintool.o
+OBJS += simulator.o
+OBJS += directory.o
+OBJS += private.o
+#xOBJS += optimiz_heap.o
+OBJS += malloc.o
+
 ## build rules
 
 %.o : %.c
-## TODO: too many rules, optimize here
-	$(CXX) -c $(CFLAGS) -odlist.o dlist.c
-	$(CXX) -c $(CFLAGS) -ohash_table.o hash_table.c
-	$(CXX) -c $(CFLAGS) -opintool.o pintool.c
-	$(CXX) -c $(CFLAGS) -osimulator.o simulator.c
-	$(CXX) -c $(CFLAGS) -odirectory.o directory.c
-	$(CXX) -c $(CFLAGS) -oprivate.o private.c
-	$(CXX) -c $(CFLAGS) -ooptimiz_heap.o optimiz_heap.c
+	$(CXX) -c $(CFLAGS) -o $@ $^
 
-all: $(TOOLS)
-$(TOOLS): %$(PINTOOL_SUFFIX) : %.o
-	${LINKER} $(PIN_LDFLAGS) $(LINK_DEBUG) -osimulator.so directory.o dlist.o hash_table.o pintool.o private.o simulator.o optimiz_heap.o ${PIN_LPATHS} $(PIN_LIBS) $(DBG)
+all: $(OBJS) $(TOOLS)
+
+$(TOOLS):
+	${LINKER} $(PIN_LDFLAGS) $(LINK_DEBUG) -o$@ ${OBJS} ${PIN_LPATHS} $(PIN_LIBS) $(DBG)
 clean:
 	rm -f *.o

@@ -35,4 +35,5 @@ int dlist_find_n_remove_node(dlist_node_t **head, void *key,
 							 int (*cmp)(void *, void *),
 							 void (*cleanup)(void *));
 void dlist_flush(dlist_node_t **list, void (*cleanup)(void *));
+void dlist_insert_after(dlist_node_t *node, void *data);
 #endif /* __LIST_H__ */

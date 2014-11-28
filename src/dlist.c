@@ -93,7 +93,7 @@ int dlist_insert_head(dlist_node_t **list, void *data)
 
 /* dlist_next returns the next node. Should be used while iterating
  * through the list */
-inline dlist_node_t *dlist_next(dlist_node_t *list)
+dlist_node_t *dlist_next(dlist_node_t *list)
 {
 	return (list) ? (list->next) : NULL;
 }
@@ -204,6 +204,20 @@ int dlist_find_n_remove_node(dlist_node_t **head, void *key,
 		return 1;
 
 	return dlist_remove_node(head, &p, cleanup);
+}
+
+void dlist_insert_after(dlist_node_t *node, void *data)
+{
+	dlist_node_t *new_node = dlist_new_node();
+
+	new_node->data = data;
+
+	new_node->prev = node;
+	new_node->next = node->next;
+
+	if(node->next)
+		node->next->prev = new_node;
+	node->next = new_node;
 }
 
 /* Initialize list pointer to null */

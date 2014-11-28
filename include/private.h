@@ -12,7 +12,7 @@
 // the memory permissions do not change once mapped
 //#define DISABLE_RDONLY_COHERENCE
 
-#define MAX_MAPPINGS 1000
+#define MAX_MAPPINGS 10000
 #define LINES_PER_PAGE (1 << (PAGEOFF_BITS - N_BLOCKOFF_BITS))
 #define PAGE_MASK ((1 << PAGEOFF_BITS) - 1)
 

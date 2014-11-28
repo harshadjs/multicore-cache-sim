@@ -17,7 +17,8 @@
 #define N_BLOCKOFF_BITS 6
 #define N_TAG_BITS (32-N_SET_BITS-N_BLOCKOFF_BITS)
 // page size: 4k
-#define PAGEOFF_BITS 12
+#define PAGEOFF_BITS 22
+#define PAGE_SIZ (1 << PAGEOFF_BITS)
 
 #define __MASK_TAG ((1 << (N_TAG_BITS)) - 1)
 #define MASK_TAG (__MASK_TAG << (N_BLOCKOFF_BITS + N_SET_BITS))
