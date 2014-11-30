@@ -249,6 +249,25 @@ cache_line_t *cache_search_shared(int core, uint64_t address)
 	return NULL;
 }
 
+/* for use with update protocol */
+void cache_search_and_update(int core, uint64_t addr) {
+  int j;
+  // search the owner's cache for in-use lines
+  for(j = 0; j < N_LINES; j++) {
+	cache_line_t *line;
+	line = &cores[core].sets[cache_get_set(addr)].lines[j];
+	if( (IS_VALID(line)) && 
+		(((line->tag) & MASK_TAG) == cache_get_tag(addr))) {
+	  // this line is for the given page and is in-use
+	  if(IS_SHARED(line)) {
+		dir_get_shared(core, addr);
+	  } else {
+		dir_get_excl(core, addr);
+	  }
+	}
+  }
+}
+
 /* Search local cache for exclusive access to address */
 cache_line_t *cache_search_excl(int core, uint64_t address)
 {

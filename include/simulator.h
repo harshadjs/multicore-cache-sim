@@ -22,7 +22,7 @@
 #define N_BLOCKOFF_BITS 6
 #define N_TAG_BITS (32-N_SET_BITS-N_BLOCKOFF_BITS)
 // page size: 4k
-#define PAGEOFF_BITS 22
+#define PAGEOFF_BITS 12
 #define PAGE_SIZ (1 << PAGEOFF_BITS)
 
 #define __MASK_TAG ((1 << (N_TAG_BITS)) - 1)
@@ -96,6 +96,9 @@ void cache_read(int, uint64_t);
 
 /* Write from a cache for a particular core */
 void cache_write(int, uint64_t);
+
+/* For use with update protocol */
+void cache_search_and_update(int, uint64_t);
 
 #define PERCENTAGE(__num, __total) (((__total) == 0) ?	\
 									(0) : ((((double)(__num)) * 100.0)/(__total)))

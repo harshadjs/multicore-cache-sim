@@ -12,6 +12,7 @@ simulator_path="/afs/andrew.cmu.edu/usr11/tloffred/Coursework/Arch/gitproj/"
 pin_path="/afs/andrew.cmu.edu/usr11/tloffred/Coursework/Arch/proj/pin-2.14"
 
 benchmarks=[ "fluidanimate", "blackscholes", "canneal", "swaptions", "x264" ]
+#benchmarks=[  "canneal" ]
 # benchmarks=[ "facesim", "blackscholes", "bodytrack", "ferret", \
 #              "ferret", "fluidanimate", "freqmine", "raytrace", \
 #              "swaptions", "vips", "x264" ]
@@ -43,7 +44,7 @@ for bm in benchmarks:
     #command = "sudo %s/bin/parsecmgmt -n 2 -s \"%s/pin\
     #          -t %s/bin/simulator.so --\" \
     #          -a run -p %s" % (parsec_path, pin_path, simulator_path, bm)
-    command = "%s/bin/parsecmgmt -n 8 -s \"%s/pin\
+    command = "%s/bin/parsecmgmt -n 8 -s \"%s/pin.sh\
               -t %s/bin/simulator.so --\" \
               -a run -i simsmall -p %s" % (parsec_path, pin_path, simulator_path, bm)
 

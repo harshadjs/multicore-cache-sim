@@ -16,7 +16,7 @@ void pin_read_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
 
 	PIN_GetLock(&lock, PIN_ThreadId());
 	for(i = 0; i < size; i++)
-		cache_read(core, ALTER_ADDRESS(addr + i));
+	  cache_read(core, ALTER_ADDRESS((void *)((char *)addr + i)));
 	PIN_ReleaseLock(&lock);
 }
 
@@ -31,7 +31,7 @@ void pin_write_handler(ADDRINT addr, ADDRINT pc, UINT32 size, bool write)
 	 */
 	PIN_GetLock(&lock, PIN_ThreadId());
 	for(i = 0; i < size; i++)
-		cache_write(core, ALTER_ADDRESS(addr + i));
+	  cache_write(core, ALTER_ADDRESS((void *)((char *)addr + i)));
 	PIN_ReleaseLock(&lock);
 }
 

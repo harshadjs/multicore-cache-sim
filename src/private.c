@@ -63,8 +63,8 @@ int alloc_new_map(uint64_t addr) {
   }
   if(!done) {
 	// reference to unmapped region?
-	start_addr = addr - (addr & (0x1000-1));
-	end_addr = start_addr + 0x1000;
+	start_addr = addr - (addr & PAGE_MASK);
+	end_addr = start_addr + PAGE_SIZE*UNK_MAP_GUESS;
 	readable = true;
 	writable = true;
 	strcpy(fstr, "[unmapped?]");
@@ -116,6 +116,29 @@ int map_cmp(const void* a, const void* b) {
   return m1->num_shared_pages - m2->num_shared_pages;
 }
 
+void cache_invalidate_page(int core, uint64_t address) {
+  int i;
+  uint64_t base = address - (address & PAGE_MASK);
+  for(i = 0; i < LINES_PER_PAGE; i++) {
+	cache_invalidate(core, base + i*BLOCK_SIZE);
+  }
+}
+
+void dir_update_page(int core, uint64_t address) {
+  // for the update protocol, we add all cache lines 
+  // in the owner's cache for that page into the directory
+  // (evicting if needed)
+  uint64_t base = address - (address & PAGE_MASK);
+  uint64_t addr;
+  int i, j;
+
+  for(i = 0; i < LINES_PER_PAGE; i++) {
+	addr = base + i*BLOCK_SIZE;
+	cache_search_and_update(core, addr);
+  }
+  
+}
+
 bool access_page(int core, uint64_t addr)
 {
   uint64_t tag = GET_PAGE_TAG(addr);
@@ -150,7 +173,22 @@ bool access_page(int core, uint64_t addr)
 		  // This is how pages become permanently shared,
 		  // and enter into the directory protocol
 		  val->priv = false;
-		  cache_invalidate(val->owner, addr);
+#ifdef OPTIMIZ
+#ifdef OPTIMIZ_UPDATE_PROTOCOL
+		  // for the update protocol, we add all cache lines 
+		  // in the owner's cache for that page into the directory
+		  // (evicting if needed)
+		  dir_update_page(val->owner, addr);
+#else
+		  // for the flushing protocol, we invalidate all 
+		  // cache lines for that page in owning processor
+		  cache_invalidate_page(val->owner, addr);
+#endif
+#else
+		  // for the flushing protocol, we invalidate all 
+		  // cache lines for that page in owning processor
+		  cache_invalidate_page(val->owner, addr);
+#endif
 		  PAGE_SET_PROCESSOR_BM(val, core, addr);
 		  return false;
 		} else {
