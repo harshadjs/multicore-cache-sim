@@ -14,7 +14,6 @@
 #define MALLOC_NLISTS 4
 
 mem_list_t lists[MALLOC_NLISTS];
-#define printf(...)
 
 #define WITHIN_MEMRANGE(__mem, __real)						\
 	(((__real) >= (__mem)->mem_real) &&						\
@@ -198,11 +197,8 @@ void *pin_malloc(size_t size)
 	int i;
 	mem_range *mem;
 
-	printf("Malloced %lu bytes at %p\n", size, ptr);
-
 	mem = create_memrange(&lists[listnum], (uint64_t)ptr, size_aligned, size);
 
-	dump_lists();
 
 	return ptr;
 }
@@ -215,11 +211,9 @@ void *pin_realloc(void *orig_ptr, size_t size)
 	mem_range *mem;
 
 	free_memrange(&lists[listnum], (uint64_t)orig_ptr);
-	printf("Realloced %lx bytes at %p\n", size, ptr);
 	mem = create_memrange(&lists[listnum], (uint64_t)ptr, size_aligned, size);
 	mem->alloc_size = size;
 
-	dump_lists();
 
     return ptr;
 }
@@ -232,24 +226,20 @@ void *pin_calloc(size_t nmemb, size_t size)
 	uint64_t total = ((uint64_t)size) * ((uint64_t)nmemb);
 	total = ALIGN_PAGE_BOUNDARY(total);
 
-	printf("Calloced %lx bytes at %p\n", size*nmemb, ptr);
 	mem = create_memrange(&lists[listnum], (uint64_t)ptr, total, nmemb*size);
 	mem->alloc_size = nmemb * size;
 
 
-	dump_lists();
 
 	return ptr;
 }
 
 void pin_free(void *ptr)
 {
-	printf("Pin free\n");
 	int listnum = PIN_ThreadId() % MALLOC_NLISTS;
 
 	free_memrange(&lists[listnum], (uint64_t)ptr);
 	free(ptr);
-	printf("Finished\n");
 }
 
 void malloc_init(void)

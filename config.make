@@ -10,7 +10,7 @@
 PRIVATE_TRACKING=1
 
 ## Plot directory
-PLOT_DIR=/tmp/plot
+## PLOT_DIR=/tmp/plot
 
 ## Do not remove these parameters, otherwise the code will
 ## will not compile
@@ -27,6 +27,6 @@ DIR_NWAYS=4
 OPTIMIZ=1
 
 ## Finer control
-OPTIMIZ_HEAP=0
-OPTIMIZ_RDONLY_COHERENCE=0
-OPTIMIZ_UPDATE_PROTOCOL=1
+# OPTIMIZ_HEAP=1
+# OPTIMIZ_RDONLY_COHERENCE=0
+# OPTIMIZ_UPDATE_PROTOCOL=1

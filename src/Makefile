@@ -2,8 +2,6 @@
 ## Barebones Makefile for Pintool
 ##
 
-PIN_ROOT=/afs/andrew.cmu.edu/usr11/tloffred/Coursework/Arch/proj/pin-2.14
-
 SIM_ROOT=..
 PIN_ARCH = intel64
 

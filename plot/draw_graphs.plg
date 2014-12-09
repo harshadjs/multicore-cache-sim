@@ -1,4 +1,4 @@
-set term pdf
+set term postscript monochrome
 set output output_file
 
 ################
@@ -8,9 +8,13 @@ set output output_file
 set title "Page tracking statistics"
 set style data histograms
 set style histogram rowstacked
-set boxwidth 0.2 relative
+set boxwidth 0.5 relative
+set key opaque
 
-set style fill solid 1.0 border -1
+#set style fill solid 1.0 border -1
+set samples 11, 11
+set yrange [0:100]
+set style fill pattern 11 border
 set datafile separator " "
 
 set xtics rotate by 315
@@ -18,40 +22,74 @@ set xtics rotate by 315
 plot page_track_input_file\
 	 using 2:xtic(1) t "private", \
 	 '' using 3:xtic(1) t "shared", \
-	 '' using 4:xtic(1) t "multiprivate", \
-	 '' using 5 t "" smooth unique
+	 '' using 4 t "" smooth unique
+#	 '' using 4:xtic(1) t "multiprivate", \
 
 #################
 ## block stats ##
 #################
 
 set title "Block tracking statistics"
+set auto x
+set auto y
 set style data histograms
-set style histogram rowstacked
-set boxwidth 0.2 relative
+set style histogram cluster gap 1
+set key opaque
 
-set style fill solid 1.0 border -1
+#set boxwidth 0.2 relative
+set boxwidth 0 relative
+
+set style fill pattern 11 border -1
+
+#set style fill solid 1.0 border -1
 set datafile separator " "
 
+set yrange [0:100]
+set xtic scale 0
 set xtics rotate by 315
 
-plot block_track_input_file \
-	 using 2:xtic(1) t "private", \
-	 '' using 3 t "shared", \
+plot block_track_input_file using 2:xtic(1) t "Private", \
+	 '' using 3 t "Detected Private", \
 	 '' using 4 t "" smooth unique
+
+# set title "Block tracking statistics"
+# set style data histograms
+# set style histogram rowstacked
+# set boxwidth 0.5 relative
+# set key opaque
+
+# set yrange [0:100]
+# set style fill pattern 11 border
+# #set style fill solid 1.0 border -1
+# set datafile separator " "
+
+# set xtics rotate by 315
+
+# plot block_track_input_file \
+# 	 using 2:xtic(1) t "private", \
+# 	 '' using 3 t "shared", \
+# 	 '' using 4 t "" smooth unique
 
 #################
 ## Cache stats ##
 #################
 
 set title "Cache statistics"
+set auto x
+set auto y
 set style data histograms
-set style histogram cluster gap 0.2
+set style histogram cluster gap 1
+set key opaque
 
-set boxwidth 0.2 relative
-set style fill solid 1.0 border -1
+#set boxwidth 0.2 relative
+set boxwidth 0 relative
+
+set style fill pattern 11 border -1
+
+#set style fill solid 1.0 border -1
 set datafile separator " "
 
+set xtic scale 0
 set xtics rotate by 315
 
 plot cache_stats_input_file using 2:xtic(1) t "core cache misses", \

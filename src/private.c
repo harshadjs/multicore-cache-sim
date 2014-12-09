@@ -70,7 +70,7 @@ int alloc_new_map(uint64_t addr) {
 	strcpy(fstr, "[unmapped?]");
   }
   fclose(fp);
-  
+
   mm.maps[max_index].start_addr = start_addr;
   mm.maps[max_index].end_addr = end_addr;
 #ifdef OPTIMIZ
@@ -104,7 +104,7 @@ int search_mem_map(uint64_t addr) {
   for(int i = 0; i < max_index; i++) {
 	if(addr >= mm.maps[i].start_addr && addr <= mm.maps[i].end_addr) {
 	  return i;
-	} 
+	}
   }
   // no matching range found
   return alloc_new_map(addr);
@@ -136,7 +136,6 @@ void dir_update_page(int core, uint64_t address) {
 	addr = base + i*BLOCK_SIZE;
 	cache_search_and_update(core, addr);
   }
-  
 }
 
 bool access_page(int core, uint64_t addr)
@@ -249,7 +248,7 @@ void print_false_sharing_report(void)
 		  if(!entry->line_bm[i]) {
 			// if this line was unused, ignore it
 			continue;
-		  } 
+		  }
 		  if(any_shared_blocks) {
 			det_shared_blocks++;
 		  } else {
@@ -272,7 +271,6 @@ void print_false_sharing_report(void)
 			multiprivate_pages++;
 			mm.maps[entry->map_index].num_multiprivate_pages++;
 		}
-
 	}
 
 	// sort regions by # of shared pages
@@ -347,17 +345,19 @@ void print_false_sharing_report(void)
 		   (100.0*det_priv_blocks)/(det_priv_blocks+det_shared_blocks),
 		   (100.0*priv_blocks)/(priv_blocks+shared_blocks));
 
-	fprintf(fp_page_tracking, "%s %lf %lf %lf\n",
+	fprintf(fp_page_tracking, "%s %lf %lf\n",
 			program_name,
 			PERCENTAGE(priv_pages, total_pages),
-			PERCENTAGE(shared_pages, total_pages),
+			PERCENTAGE(shared_pages + multiprivate_pages, total_pages));
+#if 0
 			PERCENTAGE(multiprivate_pages, total_pages));
+#endif
 	fclose(fp_page_tracking);
 
 	fprintf(fp_block_tracking, "%s %lf %lf\n",
 			program_name,
 			PERCENTAGE(priv_blocks, priv_blocks + shared_blocks),
-			PERCENTAGE(shared_blocks, priv_blocks + shared_blocks));
+			PERCENTAGE(det_priv_blocks, priv_blocks + shared_blocks));
 	fclose(fp_block_tracking);
 }
 

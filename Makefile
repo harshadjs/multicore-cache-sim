@@ -3,7 +3,10 @@
 ##
 
 CONFIG=./config.make
+OPTIMIZATIONS=/tmp/optimiz.conf
+export PIN_ROOT=/home/harshad/tools/pin
 include $(CONFIG)
+include $(OPTIMIZATIONS)
 
 ifeq ($(PINTOOL), 1)
 CFLAGS += -DPINTOOL
@@ -19,6 +22,14 @@ endif
 
 ifeq ($(OPTIMIZ_HEAP), 1)
 CFLAGS += -DOPTIMIZ_HEAP
+endif
+
+ifeq ($(OPTIMIZ_UPDATE_PROTOCOL), 1)
+CFLAGS += -DOPTIMIZ_UPDATE_PROTOCOL
+endif
+
+ifeq ($(OPTIMIZ_RDONLY_COHERENCE), 1)
+CFLAGS += -DOPTIMIZ_RDONLY_COHERENCE
 endif
 
 CFLAGS += -DPLOT_DIR=\"${PLOT_DIR}\" -DDIR_NWAYS=${DIR_NWAYS} -DDIR_SET_BITS=${DIR_SET_BITS}

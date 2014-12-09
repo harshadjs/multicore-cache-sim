@@ -10,6 +10,7 @@
 #include "simulator.h"
 #include "directory.h"
 #include "private.h"
+#include <time.h>
 
 extern PIN_LOCK lock;
 
@@ -28,6 +29,9 @@ uint64_t ticks;
 cache_t cores[N_CORES];
 
 char *program_name;
+
+clock_t begin;
+
 
 void dump_core_cache(int core)
 {
@@ -296,8 +300,16 @@ cache_line_t *cache_search_excl(int core, uint64_t address)
 void cache_read(int core, uint64_t address)
 {
 	cache_line_t *line;
+	clock_t end;
 
-#ifdef IGNORE_STARTING_THREAD
+	end = clock();
+//	printf("[%d]\n", (end - begin)/CLOCKS_PER_SEC);
+	if(((end - begin)/CLOCKS_PER_SEC) > 600) {
+		printf(".......10 mins elapsed. Killing\n");
+		PIN_ExitApplication(0);
+	}
+
+#ifdef IGNORE_STARTING_THREAD_not
 	if(core == 0) {
 	  return;
 	}
@@ -320,7 +332,7 @@ void cache_write(int core, uint64_t address)
 {
 	cache_line_t *line;
 
-#ifdef IGNORE_STARTING_THREAD
+#ifdef IGNORE_STARTING_THREAD_not
 	if(core == 0) {
 	  return;
 	}
@@ -424,6 +436,8 @@ int main(int argc, char *argv[])
 	unsigned int i;
 
 	directory_init();
+	begin = clock();
+
 	if(argc > 12) {
 	  program_name = strrchr(argv[12], '/');
 	  printf("program: %s\n", program_name);
