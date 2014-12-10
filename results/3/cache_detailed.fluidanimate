@@ -1,0 +1,9 @@
+hits = 133005352
+misses = 85945
+directory_transactions = 66599
+directory_misses = 19231
+directory_hits = 30725
+directory_invalidations = 0
+directory_excl_hits = 11913
+directory_shared_hits = 18812
+directory_deletions = 19231

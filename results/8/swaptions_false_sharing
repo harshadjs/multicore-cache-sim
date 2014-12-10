@@ -1,0 +1,358 @@
+********************
+Data Privacy Report
+********************
+[unmapped?]Private Pages: 63 (100.00%)
+Shared Pages: 0 (0.00%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 874 (82.92%)
+Shared Blocks: 180 (17.08%)
+Potential Page Gain: -10.8
+7faf6d07f000-7faf6d184000 r-xp 00000000 08:01 948472                     /lib/x86_64-linux-gnu/libm-2.19.so
+Private Pages: 73 (98.65%)
+Shared Pages: 1 (1.35%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 481 (57.54%)
+Shared Blocks: 355 (42.46%)
+Potential Page Gain: -30.4
+7fffc0a6e000-7fffc0a70000 r-xp 00000000 00:00 0                          [vdso]
+ pzm¯Private Pages: 58 (98.31%)
+Shared Pages: 1 (1.69%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 445 (89.00%)
+Shared Blocks: 55 (11.00%)
+Potential Page Gain: -5.5
+7faf827bb000-7faf827de000 r-xp 00000000 08:01 948470                     /lib/x86_64-linux-gnu/ld-2.19.so
+Private Pages: 38 (97.44%)
+Shared Pages: 1 (2.56%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 373 (92.10%)
+Shared Blocks: 32 (7.90%)
+Potential Page Gain: -2.1
+7faf6ca9b000-7faf6cc56000 r-xp 00000000 08:01 948469                     /lib/x86_64-linux-gnu/libc-2.19.so
+Private Pages: 68 (97.14%)
+Shared Pages: 2 (2.86%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 1059 (94.81%)
+Shared Blocks: 58 (5.19%)
+Potential Page Gain: -1.6
+[unmapped?]Private Pages: 100 (98.04%)
+Shared Pages: 2 (1.96%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 4004 (99.08%)
+Shared Blocks: 37 (0.92%)
+Potential Page Gain: 1.1
+00400000-00411000 r-xp 00000000 08:03 9705756                            /mnt/test/parsec_2.1/parsec-2.1/pkgs/apps/swaptions/inst/amd64-linux.gcc/bin/swaptions
+00610000-00612000 rw-p 00010000 08:03 9705756                            /mnt/test/parsec_2.1/parsec-2.1/pkgs/apps/swaptions/inst/amd64-linux.gcc/bin/swaptions
+Private Pages: 113 (98.26%)
+Shared Pages: 2 (1.74%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 3843 (99.20%)
+Shared Blocks: 31 (0.80%)
+Potential Page Gain: 1.1
+7faf6ce5c000-7faf6ce61000 rw-p 00000000 00:00 0 
+Private Pages: 95 (97.94%)
+Shared Pages: 2 (2.06%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 3790 (99.68%)
+Shared Blocks: 12 (0.32%)
+Potential Page Gain: 1.7
+7faf6ce61000-7faf6ce7a000 r-xp 00000000 08:01 948482                     /lib/x86_64-linux-gnu/libpthread-2.19.so
+Private Pages: 24 (88.89%)
+Shared Pages: 3 (11.11%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 812 (98.07%)
+Shared Blocks: 16 (1.93%)
+Potential Page Gain: 2.5
+7faf6d6bb000-7faf6d6e3000 r--p 00000000 08:01 1070033                    /etc/ld.so.cache
+Private Pages: 27 (87.10%)
+Shared Pages: 4 (12.90%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 150 (79.37%)
+Shared Blocks: 39 (20.63%)
+Potential Page Gain: -2.4
+7faf6c6ba000-7faf6c726000 rwxp 00000000 00:00 0 
+Private Pages: 64 (94.12%)
+Shared Pages: 4 (5.88%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 1358 (95.97%)
+Shared Blocks: 57 (4.03%)
+Potential Page Gain: 1.3
+7faf6d674000-7faf6d689000 rw-p 00000000 00:00 0 
+Private Pages: 13 (76.47%)
+Shared Pages: 4 (23.53%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 458 (97.86%)
+Shared Blocks: 10 (2.14%)
+Potential Page Gain: 3.6
+7faf6ca7b000-7faf6ca8c000 rwxp 00000000 00:00 0 
+Private Pages: 49 (92.45%)
+Shared Pages: 4 (7.55%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 745 (95.64%)
+Shared Blocks: 34 (4.36%)
+Potential Page Gain: 1.7
+7faf6c860000-7faf6c862000 rw-p 00000000 00:00 0 
+Private Pages: 126 (96.92%)
+Shared Pages: 4 (3.08%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 4660 (98.62%)
+Shared Blocks: 65 (1.38%)
+Potential Page Gain: 2.2
+7faf63d02000-7faf63d11000 rwxp 00000000 00:00 0 
+Private Pages: 5 (50.00%)
+Shared Pages: 4 (40.00%)
+Multiprivate Pages: 1 (10.00%)
+Private Blocks: 162 (92.05%)
+Shared Blocks: 14 (7.95%)
+Potential Page Gain: 4.2
+[unmapped?]Private Pages: 41 (91.11%)
+Shared Pages: 4 (8.89%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 1027 (95.45%)
+Shared Blocks: 49 (4.55%)
+Potential Page Gain: 2.0
+7faf6c865000-7faf6c87b000 r-xp 00000000 08:01 923959                     /lib/x86_64-linux-gnu/libgcc_s.so.1
+Private Pages: 23 (82.14%)
+Shared Pages: 5 (17.86%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 996 (96.14%)
+Shared Blocks: 40 (3.86%)
+Potential Page Gain: 3.9
+7faf6575d000-7faf65f5e000 rw-p 00000000 00:00 0 
+Private Pages: 56 (76.71%)
+Shared Pages: 5 (6.85%)
+Multiprivate Pages: 12 (16.44%)
+Private Blocks: 891 (96.32%)
+Shared Blocks: 34 (3.68%)
+Potential Page Gain: 14.3
+7faf829dd000-7faf829df000 rw-p 00022000 08:01 948470                     /lib/x86_64-linux-gnu/ld-2.19.so
+Private Pages: 4 (44.44%)
+Shared Pages: 5 (55.56%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 188 (89.52%)
+Shared Blocks: 22 (10.48%)
+Potential Page Gain: 4.1
+7faf6797a000-7faf6817b000 rw-p 00000000 00:00 0 
+Private Pages: 2 (28.57%)
+Shared Pages: 5 (71.43%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 32 (69.57%)
+Shared Blocks: 14 (30.43%)
+Potential Page Gain: 2.9
+7faf6d385000-7faf6d46b000 r-xp 00000000 08:01 7444                       /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19
+Private Pages: 129 (95.56%)
+Shared Pages: 6 (4.44%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 4691 (98.12%)
+Shared Blocks: 90 (1.88%)
+Potential Page Gain: 3.5
+7fffc0a18000-7fffc0a39000 rw-p 00000000 00:00 0 
+Private Pages: 48 (88.89%)
+Shared Pages: 6 (11.11%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 1120 (95.00%)
+Shared Blocks: 59 (5.00%)
+Potential Page Gain: 3.3
+7faf6d689000-7faf6d6b5000 rwxp 00000000 00:00 0 
+Private Pages: 1 (12.50%)
+Shared Pages: 7 (87.50%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 86 (53.09%)
+Shared Blocks: 76 (46.91%)
+Potential Page Gain: 3.2
+7faf6c5a3000-7faf6c6ba000 rwxp 00000000 00:00 0 
+Private Pages: 29 (60.42%)
+Shared Pages: 8 (16.67%)
+Multiprivate Pages: 11 (22.92%)
+Private Blocks: 906 (97.52%)
+Shared Blocks: 23 (2.48%)
+Potential Page Gain: 17.8
+7faf6d6b5000-7faf6d6b9000 rwxp 00000000 00:00 0 
+Private Pages: 8 (50.00%)
+Shared Pages: 8 (50.00%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 479 (88.05%)
+Shared Blocks: 65 (11.95%)
+Potential Page Gain: 6.1
+7faf6ca8c000-7faf6ca92000 rwxp 00000000 00:00 0 
+Private Pages: 46 (85.19%)
+Shared Pages: 8 (14.81%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 735 (94.96%)
+Shared Blocks: 39 (5.04%)
+Potential Page Gain: 5.3
+7faf6ca92000-7faf6ca9b000 rwxp 00000000 00:00 0 
+Private Pages: 4 (33.33%)
+Shared Pages: 8 (66.67%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 63 (61.76%)
+Shared Blocks: 39 (38.24%)
+Potential Page Gain: 3.4
+7faf6ce56000-7faf6ce5c000 rw-p 001bb000 08:01 948469                     /lib/x86_64-linux-gnu/libc-2.19.so
+Private Pages: 3 (27.27%)
+Shared Pages: 8 (72.73%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 301 (92.62%)
+Shared Blocks: 24 (7.38%)
+Potential Page Gain: 7.2
+7faf63d28000-7faf64653000 rwxp 00000000 00:00 0                          [stack:14095]
+Private Pages: 1 (8.33%)
+Shared Pages: 8 (66.67%)
+Multiprivate Pages: 3 (25.00%)
+Private Blocks: 209 (83.94%)
+Shared Blocks: 40 (16.06%)
+Potential Page Gain: 9.1
+7faf829df000-7faf829e0000 rw-p 00000000 00:00 0 
+Private Pages: 8 (50.00%)
+Shared Pages: 8 (50.00%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 404 (95.06%)
+Shared Blocks: 21 (4.94%)
+Potential Page Gain: 7.2
+7faf8298f000-7faf82993000 rwxp 00000000 00:00 0 
+Private Pages: 1 (11.11%)
+Shared Pages: 8 (88.89%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 66 (75.86%)
+Shared Blocks: 21 (24.14%)
+Potential Page Gain: 5.8
+7faf6d66a000-7faf6d674000 rw-p 000e5000 08:01 7444                       /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19
+Private Pages: 24 (72.73%)
+Shared Pages: 9 (27.27%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 681 (63.70%)
+Shared Blocks: 388 (36.30%)
+Potential Page Gain: -3.0
+[unmapped?]Private Pages: 57 (86.36%)
+Shared Pages: 9 (13.64%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 1041 (94.81%)
+Shared Blocks: 57 (5.19%)
+Potential Page Gain: 5.6
+00610000-00612000 rw-p 00010000 08:03 9705756                            /mnt/test/parsec_2.1/parsec-2.1/pkgs/apps/swaptions/inst/amd64-linux.gcc/bin/swaptions
+Private Pages: 0 (0.00%)
+Shared Pages: 9 (100.00%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 86 (72.27%)
+Shared Blocks: 33 (27.73%)
+Potential Page Gain: 6.5
+[unmapped?]Private Pages: 98 (90.74%)
+Shared Pages: 10 (9.26%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 708 (85.30%)
+Shared Blocks: 122 (14.70%)
+Potential Page Gain: -5.9
+7faf6ca7a000-7faf6ca7b000 rw-p 00015000 08:01 923959                     /lib/x86_64-linux-gnu/libgcc_s.so.1
+Private Pages: 1 (9.09%)
+Shared Pages: 10 (90.91%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 140 (72.92%)
+Shared Blocks: 52 (27.08%)
+Potential Page Gain: 7.0
+7faf6c6ef000-7faf6c726000 rwxp 00000000 00:00 0 
+Private Pages: 49 (81.67%)
+Shared Pages: 11 (18.33%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 445 (83.33%)
+Shared Blocks: 89 (16.67%)
+Potential Page Gain: 1.0
+[unmapped?]Private Pages: 81 (88.04%)
+Shared Pages: 11 (11.96%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 1885 (81.21%)
+Shared Blocks: 436 (18.79%)
+Potential Page Gain: -6.3
+7faf6d079000-7faf6d07b000 rw-p 00018000 08:01 948482                     /lib/x86_64-linux-gnu/libpthread-2.19.so
+Private Pages: 31 (56.36%)
+Shared Pages: 12 (21.82%)
+Multiprivate Pages: 12 (21.82%)
+Private Blocks: 1023 (79.67%)
+Shared Blocks: 261 (20.33%)
+Potential Page Gain: 12.8
+7faf6d383000-7faf6d385000 rw-p 00104000 08:01 948472                     /lib/x86_64-linux-gnu/libm-2.19.so
+Private Pages: 33 (57.89%)
+Shared Pages: 12 (21.05%)
+Multiprivate Pages: 12 (21.05%)
+Private Blocks: 1141 (84.96%)
+Shared Blocks: 202 (15.04%)
+Potential Page Gain: 15.4
+7faf6d6e8000-7faf6d972000 rwxp 00000000 00:00 0 
+Private Pages: 5 (27.78%)
+Shared Pages: 13 (72.22%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 387 (62.62%)
+Shared Blocks: 231 (37.38%)
+Potential Page Gain: 6.3
+7faf66867000-7faf67068000 rw-p 00000000 00:00 0 
+Private Pages: 23 (63.89%)
+Shared Pages: 13 (36.11%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 823 (75.92%)
+Shared Blocks: 261 (24.08%)
+Potential Page Gain: 4.3
+7faf64653000-7faf64e54000 rw-p 00000000 00:00 0 
+Private Pages: 37 (57.81%)
+Shared Pages: 14 (21.88%)
+Multiprivate Pages: 13 (20.31%)
+Private Blocks: 1244 (75.12%)
+Shared Blocks: 412 (24.88%)
+Potential Page Gain: 11.1
+7faf68a84000-7faf69285000 rw-p 00000000 00:00 0 
+Private Pages: 24 (63.16%)
+Shared Pages: 14 (36.84%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 1083 (83.63%)
+Shared Blocks: 212 (16.37%)
+Potential Page Gain: 7.8
+7faf6bda2000-7faf6c5a3000 rw-p 00000000 00:00 0 
+Private Pages: 51 (77.27%)
+Shared Pages: 15 (22.73%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 1637 (79.54%)
+Shared Blocks: 421 (20.46%)
+Potential Page Gain: 1.5
+7faf6d07b000-7faf6d07f000 rw-p 00000000 00:00 0 
+Private Pages: 34 (68.00%)
+Shared Pages: 15 (30.00%)
+Multiprivate Pages: 1 (2.00%)
+Private Blocks: 982 (63.44%)
+Shared Blocks: 566 (36.56%)
+Potential Page Gain: -2.3
+7faf63d34000-7faf64653000 rwxp 00000000 00:00 0                          [stack:14095]
+Private Pages: 37 (67.27%)
+Shared Pages: 16 (29.09%)
+Multiprivate Pages: 2 (3.64%)
+Private Blocks: 1228 (69.07%)
+Shared Blocks: 550 (30.93%)
+Potential Page Gain: 1.0
+7faf6ac98000-7faf6b499000 rw-p 00000000 00:00 0 
+Private Pages: 28 (63.64%)
+Shared Pages: 16 (36.36%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 1099 (71.41%)
+Shared Blocks: 440 (28.59%)
+Potential Page Gain: 3.4
+7faf69b8e000-7faf6a38f000 rw-p 00000000 00:00 0 
+Private Pages: 29 (63.04%)
+Shared Pages: 16 (34.78%)
+Multiprivate Pages: 1 (2.17%)
+Private Blocks: 1189 (73.94%)
+Shared Blocks: 419 (26.06%)
+Potential Page Gain: 5.0
+7faf827de000-7faf827ef000 rwxp 00000000 00:00 0 
+Private Pages: 25 (58.14%)
+Shared Pages: 17 (39.53%)
+Multiprivate Pages: 1 (2.33%)
+Private Blocks: 829 (77.33%)
+Shared Blocks: 243 (22.67%)
+Potential Page Gain: 8.3
+********************
+      Summary       
+********************
+Private Pages: 386 (77.51%)
+Shared Pages: 98 (19.68%)
+Multiprivate Pages: 14 (2.81%)
+Private Blocks: 10853 (87.03%)
+Shared Blocks: 1617 (12.97%)
+Potential Gap: 9.52%
+Detected Private Blocks (Ideal): 65.33% (87.03%)

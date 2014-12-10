@@ -1,0 +1,328 @@
+********************
+Data Privacy Report
+********************
+0114a000-011af000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011d0000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011f1000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01212000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01233000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01254000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01275000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01296000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 56 (72.73%)
+Shared Pages: 21 (27.27%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 3492 (98.81%)
+Shared Blocks: 42 (1.19%)
+Potential Page Gain: 20.1
+0114a000-0118e000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011af000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011d0000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011f1000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01212000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01233000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01254000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01275000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01296000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 209 (90.09%)
+Shared Pages: 23 (9.91%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 3854 (98.80%)
+Shared Blocks: 47 (1.20%)
+Potential Page Gain: 20.2
+7fff6dc84000-7fff6dc86000 r-xp 00000000 00:00 0                          [vdso]
+0114a000-0116d000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-0118e000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011af000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011d0000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011f1000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01212000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01233000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01254000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01275000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01296000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 140 (85.37%)
+Shared Pages: 24 (14.63%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 1833 (96.93%)
+Shared Blocks: 58 (3.07%)
+Potential Page Gain: 19.0
+0114a000-0114c000 rw-p 00000000 00:00 0                                  [heap]
+7fff6dc84000-7fff6dc86000 r-xp 00000000 00:00 0                          [vdso]
+0114a000-0116d000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-0118e000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011af000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011d0000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011f1000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01212000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01233000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01254000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01275000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01296000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 160 (86.96%)
+Shared Pages: 24 (13.04%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 1891 (97.32%)
+Shared Blocks: 52 (2.68%)
+Potential Page Gain: 19.1
+0114a000-01212000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01233000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01254000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01275000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01296000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 206 (89.18%)
+Shared Pages: 25 (10.82%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 3819 (98.73%)
+Shared Blocks: 49 (1.27%)
+Potential Page Gain: 22.1
+0114a000-011d0000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011f1000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01212000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01233000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01254000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01275000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01296000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 205 (89.13%)
+Shared Pages: 25 (10.87%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 3757 (98.71%)
+Shared Blocks: 49 (1.29%)
+Potential Page Gain: 22.0
+00400000-00587000 r-xp 00000000 08:03 9706332                            /mnt/test/parsec_2.1/parsec-2.1/pkgs/apps/fluidanimate/inst/amd64-linux.gcc/bin/fluidanimate
+Private Pages: 420 (75.13%)
+Shared Pages: 139 (24.87%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 31335 (93.11%)
+Shared Blocks: 2317 (6.89%)
+Potential Page Gain: 100.5
+0114a000-011f1000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01212000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01233000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01254000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01275000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01296000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 390 (72.63%)
+Shared Pages: 147 (27.37%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 31156 (92.85%)
+Shared Blocks: 2398 (7.15%)
+Potential Page Gain: 108.6
+7fff6dbfb000-7fff6dc1c000 rw-p 00000000 00:00 0 
+Private Pages: 390 (72.63%)
+Shared Pages: 147 (27.37%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 31263 (92.91%)
+Shared Blocks: 2385 (7.09%)
+Potential Page Gain: 108.9
+0078e000-007a9000 rw-p 00000000 00:00 0 
+Private Pages: 387 (72.34%)
+Shared Pages: 148 (27.66%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 30463 (91.60%)
+Shared Blocks: 2794 (8.40%)
+Potential Page Gain: 103.1
+7fbbf29a6000-7fbbf31a7000 rw-p 00000000 00:00 0 
+Private Pages: 510 (74.13%)
+Shared Pages: 172 (25.00%)
+Multiprivate Pages: 6 (0.87%)
+Private Blocks: 40002 (92.94%)
+Shared Blocks: 3039 (7.06%)
+Potential Page Gain: 129.4
+7fbbf4bba000-7fbbf5b3b000 rw-p 00000000 00:00 0 
+Private Pages: 529 (74.72%)
+Shared Pages: 173 (24.44%)
+Multiprivate Pages: 6 (0.85%)
+Private Blocks: 41174 (92.81%)
+Shared Blocks: 3189 (7.19%)
+Potential Page Gain: 128.1
+0114a000-01254000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01275000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01296000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 564 (75.70%)
+Shared Pages: 175 (23.49%)
+Multiprivate Pages: 6 (0.81%)
+Private Blocks: 43942 (93.74%)
+Shared Blocks: 2936 (6.26%)
+Potential Page Gain: 134.3
+7fbbed474000-7fbbedc75000 rw-p 00000000 00:00 0 
+Private Pages: 522 (74.25%)
+Shared Pages: 178 (25.32%)
+Multiprivate Pages: 3 (0.43%)
+Private Blocks: 41225 (92.83%)
+Shared Blocks: 3182 (7.17%)
+Potential Page Gain: 130.6
+7fbbf577b000-7fbbf5b3b000 rw-p 00000000 00:00 0 
+Private Pages: 488 (60.10%)
+Shared Pages: 182 (22.41%)
+Multiprivate Pages: 142 (17.49%)
+Private Blocks: 41000 (92.84%)
+Shared Blocks: 3164 (7.16%)
+Potential Page Gain: 265.8
+7fbbf189c000-7fbbf209d000 rw-p 00000000 00:00 0 
+Private Pages: 225 (33.09%)
+Shared Pages: 453 (66.62%)
+Multiprivate Pages: 2 (0.29%)
+Private Blocks: 20265 (71.53%)
+Shared Blocks: 8065 (28.47%)
+Potential Page Gain: 261.4
+7fbbee57e000-7fbbeed7f000 rw-p 00000000 00:00 0 
+Private Pages: 238 (34.29%)
+Shared Pages: 454 (65.42%)
+Multiprivate Pages: 2 (0.29%)
+Private Blocks: 21410 (73.20%)
+Shared Blocks: 7838 (26.80%)
+Potential Page Gain: 270.0
+0114a000-01296000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 250 (35.16%)
+Shared Pages: 459 (64.56%)
+Multiprivate Pages: 2 (0.28%)
+Private Blocks: 22145 (72.73%)
+Shared Blocks: 8304 (27.27%)
+Potential Page Gain: 267.1
+0114a000-01233000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01254000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01275000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01296000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 213 (31.19%)
+Shared Pages: 468 (68.52%)
+Multiprivate Pages: 2 (0.29%)
+Private Blocks: 18921 (66.12%)
+Shared Blocks: 9693 (33.88%)
+Potential Page Gain: 238.6
+7fbbf3ab0000-7fbbf42b1000 rw-p 00000000 00:00 0 
+Private Pages: 207 (25.78%)
+Shared Pages: 502 (62.52%)
+Multiprivate Pages: 94 (11.71%)
+Private Blocks: 22216 (74.45%)
+Shared Blocks: 7626 (25.55%)
+Potential Page Gain: 390.8
+7fbbef688000-7fbbefe89000 rw-p 00000000 00:00 0 
+Private Pages: 266 (30.43%)
+Shared Pages: 540 (61.78%)
+Multiprivate Pages: 68 (7.78%)
+Private Blocks: 27210 (78.27%)
+Shared Blocks: 7555 (21.73%)
+Potential Page Gain: 418.1
+00787000-0078e000 rw-p 00187000 08:03 9706332                            /mnt/test/parsec_2.1/parsec-2.1/pkgs/apps/fluidanimate/inst/amd64-linux.gcc/bin/fluidanimate
+Private Pages: 264 (29.46%)
+Shared Pages: 583 (65.07%)
+Multiprivate Pages: 49 (5.47%)
+Private Blocks: 24351 (67.59%)
+Shared Blocks: 11677 (32.41%)
+Potential Page Gain: 341.6
+0114a000-0116d000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-0118e000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011af000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011d0000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-011f1000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01212000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01233000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01254000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01275000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01296000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 310 (33.12%)
+Shared Pages: 597 (63.78%)
+Multiprivate Pages: 29 (3.10%)
+Private Blocks: 30605 (78.66%)
+Shared Blocks: 8301 (21.34%)
+Potential Page Gain: 426.3
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 14 (2.23%)
+Shared Pages: 615 (97.77%)
+Multiprivate Pages: 0 (0.00%)
+Private Blocks: 1224 (8.64%)
+Shared Blocks: 12939 (91.36%)
+Potential Page Gain: 40.4
+7fbbf5cea000-7fbbf5cf5000 rwxp 00000000 00:00 0 
+Private Pages: 161 (20.35%)
+Shared Pages: 622 (78.63%)
+Multiprivate Pages: 8 (1.01%)
+Private Blocks: 15937 (59.48%)
+Shared Blocks: 10855 (40.52%)
+Potential Page Gain: 309.5
+7fbbf53bb000-7fbbf5b3b000 rw-p 00000000 00:00 0 
+Private Pages: 377 (37.14%)
+Shared Pages: 630 (62.07%)
+Multiprivate Pages: 8 (0.79%)
+Private Blocks: 22362 (66.45%)
+Shared Blocks: 11289 (33.55%)
+Potential Page Gain: 297.5
+7fbbf0792000-7fbbf0f93000 rw-p 00000000 00:00 0 
+Private Pages: 317 (32.78%)
+Shared Pages: 635 (65.67%)
+Multiprivate Pages: 15 (1.55%)
+Private Blocks: 29255 (71.28%)
+Shared Blocks: 11786 (28.72%)
+Potential Page Gain: 372.3
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 277 (30.04%)
+Shared Pages: 642 (69.63%)
+Multiprivate Pages: 3 (0.33%)
+Private Blocks: 25300 (70.51%)
+Shared Blocks: 10583 (29.49%)
+Potential Page Gain: 373.1
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 255 (24.73%)
+Shared Pages: 663 (64.31%)
+Multiprivate Pages: 113 (10.96%)
+Private Blocks: 24822 (67.42%)
+Shared Blocks: 11997 (32.58%)
+Potential Page Gain: 440.1
+0114a000-01275000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-01296000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012b7000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012d8000 rw-p 00000000 00:00 0                                  [heap]
+0114a000-012f9000 rw-p 00000000 00:00 0                                  [heap]
+Private Pages: 273 (25.71%)
+Shared Pages: 715 (67.33%)
+Multiprivate Pages: 74 (6.97%)
+Private Blocks: 26350 (67.72%)
+Shared Blocks: 12561 (32.28%)
+Potential Page Gain: 446.2
+********************
+      Summary       
+********************
+Private Pages: 351 (40.48%)
+Shared Pages: 513 (59.17%)
+Multiprivate Pages: 3 (0.35%)
+Private Blocks: 26016 (68.68%)
+Shared Blocks: 11862 (31.32%)
+Potential Gap: 28.20%
+Detected Private Blocks (Ideal): 53.00% (68.68%)
